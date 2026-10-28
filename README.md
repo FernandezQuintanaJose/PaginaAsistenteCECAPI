@@ -15,7 +15,7 @@ La ficha del proyecto está en `docs/FICHA.md` y las reglas comunes en `docs/FIC
 | `assets/js/config.v1.js` | Servidor, ID de cliente de Google y rutas. Público: sin llaves |
 | `assets/js/api.v1.js` | Cliente del servidor con tiempo de espera y errores en español |
 | `assets/js/asistente.v1.js` | Lógica de la página |
-| `assets/css/`, `assets/fuentes/`, `preferencias.v1.js`, `lectura.v1.js` | Igual que en PaginaCECAPI |
+| `assets/css/`, `assets/fuentes/`, `preferencias.v2.js`, `lectura.v1.js` | Igual que en PaginaCECAPI |
 
 ## Cómo funciona
 

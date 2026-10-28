@@ -1,17 +1,17 @@
-/* Piezas propias del asistente. Usa las variables de sitio.v1.css. */
+/* Piezas propias del asistente. Usa las variables de sitio.v2.css. */
 
 .panel {
   margin-top: 2rem;
   padding: 1.25rem;
-  border: 2px solid var(--linea);
-  border-radius: 0.5rem;
+  border: 1px solid var(--linea);
+  border-radius: 0.6rem;
 }
 .panel h2 { margin-top: 0; }
 
 .estado {
   margin: 1.5rem 0 0;
   padding: 0.75rem 1rem;
-  border-left: 6px solid var(--senal);
+  border-left: 4px solid var(--acento);
   background: var(--suave);
   font-weight: 700;
 }
@@ -19,6 +19,7 @@
 .botonera {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.5rem;
   margin: 1rem 0 0;
 }
@@ -28,19 +29,19 @@
 .parte {
   padding: 1rem 1.25rem;
   background: var(--suave);
-  border-radius: 0.4rem;
+  border-radius: 0.5rem;
   min-height: 8rem;
 }
 .parte h3 { margin-top: 0; }
 .parte p:last-child { margin-bottom: 0; }
 
+/* Decisión: sin marco; la casilla, el botón principal y dos opciones discretas. */
 .decision {
   margin: 1.5rem 0 0;
-  padding: 1rem 1.25rem;
-  border: 2px solid var(--linea);
-  border-radius: 0.4rem;
+  padding: 1.25rem 0 0;
+  border-top: 1px solid var(--linea);
 }
-.decision legend { font-weight: 700; padding: 0 0.4rem; }
+.decision h3 { margin: 0 0 0.75rem; }
 .casilla { display: flex; align-items: flex-start; gap: 0.75rem; }
 .casilla input { width: 1.75rem; height: 1.75rem; margin: 0.2rem 0 0; flex: none; accent-color: var(--acento); }
 
@@ -53,8 +54,8 @@
 }
 .mensaje {
   padding: 0.75rem 1rem;
-  border-radius: 0.4rem;
-  border-left: 6px solid var(--linea);
+  border-radius: 0.5rem;
+  border-left: 4px solid var(--linea);
 }
 .mensaje + .mensaje { margin-top: 0.75rem; }
 .mensaje p { margin: 0; }
@@ -71,8 +72,8 @@ textarea {
   width: 100%;
   font: inherit;
   padding: 0.6rem 0.75rem;
-  border: 2px solid var(--tinta);
-  border-radius: 0.4rem;
+  border: 1.5px solid var(--linea);
+  border-radius: 0.5rem;
   background: var(--papel);
   color: var(--tinta);
   resize: vertical;

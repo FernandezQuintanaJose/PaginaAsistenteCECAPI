@@ -8,9 +8,9 @@
   <title>Asistente de voz de CECAPI</title>
   <meta name="description" content="Conversa por escrito con el asistente de CECAPI para personas ciegas y con baja visión.">
   <link rel="preload" href="assets/fuentes/atkinson-hyperlegible-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/sitio.v1.css">
-  <link rel="stylesheet" href="assets/css/asistente.v1.css">
-  <script src="assets/js/preferencias.v1.js"></script>
+  <link rel="stylesheet" href="assets/css/sitio.v2.css">
+  <link rel="stylesheet" href="assets/css/asistente.v2.css">
+  <script src="assets/js/preferencias.v2.js"></script>
   <script src="assets/js/lectura.v1.js" defer></script>
   <script src="assets/js/config.v1.js" defer></script>
   <script src="assets/js/api.v1.js" defer></script>
@@ -30,18 +30,19 @@
           <li><a href="https://fernandezquintanajose.github.io/PaginaCECAPI/">Sitio de CECAPI</a></li>
         </ul>
       </nav>
-    </div>
-  </header>
-
-  <section class="ajustes" aria-labelledby="titulo-ajustes">
-    <div class="contenedor">
-      <h2 id="titulo-ajustes">Ajustes de lectura</h2>
-      <button type="button" id="texto-menos">Texto más chico</button>
-      <button type="button" id="texto-mas">Texto más grande</button>
-      <button type="button" id="contraste" aria-pressed="false">Contraste alto</button>
+      <details class="menu-ajustes">
+        <summary>Ajustes de lectura</summary>
+        <div class="menu-panel">
+          <div class="grupo">
+            <button type="button" id="texto-menos">Texto más chico</button>
+            <button type="button" id="texto-mas">Texto más grande</button>
+          </div>
+          <button type="button" id="contraste" aria-pressed="false">Contraste alto</button>
+        </div>
+      </details>
       <p id="aviso-ajustes" class="solo-lector" role="status"></p>
     </div>
-  </section>
+  </header>
 
   <main id="contenido" tabindex="-1">
     <div class="contenedor">
@@ -71,8 +72,8 @@
           <button type="button" id="politica-siguiente">Siguiente</button>
         </div>
 
-        <fieldset id="politica-decision" class="decision">
-          <legend>Tu decisión</legend>
+        <div id="politica-decision" class="decision" role="group" aria-labelledby="titulo-decision">
+          <h3 id="titulo-decision">Tu decisión</h3>
           <p class="casilla">
             <input type="checkbox" id="politica-edad">
             <label for="politica-edad">Declaro que tengo 18 años o más.</label>
@@ -80,10 +81,10 @@
           <p id="politica-requisito" class="ayuda"></p>
           <div class="botonera">
             <button type="button" id="politica-aceptar" class="boton-principal" aria-describedby="politica-requisito">Aceptar</button>
-            <button type="button" id="politica-rechazar">Rechazar</button>
-            <button type="button" id="politica-despues">Después</button>
+            <button type="button" id="politica-rechazar" class="boton-texto">Rechazar</button>
+            <button type="button" id="politica-despues" class="boton-texto">Después</button>
           </div>
-        </fieldset>
+        </div>
       </section>
 
       <section id="sin-aceptar" class="panel" aria-labelledby="titulo-sin-aceptar" hidden tabindex="-1">
