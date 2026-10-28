@@ -1,0 +1,88 @@
+/* Piezas propias del asistente. Usa las variables de sitio.v1.css. */
+
+.panel {
+  margin-top: 2rem;
+  padding: 1.25rem;
+  border: 2px solid var(--linea);
+  border-radius: 0.5rem;
+}
+.panel h2 { margin-top: 0; }
+
+.estado {
+  margin: 1.5rem 0 0;
+  padding: 0.75rem 1rem;
+  border-left: 6px solid var(--senal);
+  background: var(--suave);
+  font-weight: 700;
+}
+
+.botonera {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0 0;
+}
+
+.lector-politica { margin-top: 1rem; }
+.progreso { font-weight: 700; margin-bottom: 0.5rem; }
+.parte {
+  padding: 1rem 1.25rem;
+  background: var(--suave);
+  border-radius: 0.4rem;
+  min-height: 8rem;
+}
+.parte h3 { margin-top: 0; }
+.parte p:last-child { margin-bottom: 0; }
+
+.decision {
+  margin: 1.5rem 0 0;
+  padding: 1rem 1.25rem;
+  border: 2px solid var(--linea);
+  border-radius: 0.4rem;
+}
+.decision legend { font-weight: 700; padding: 0 0.4rem; }
+.casilla { display: flex; align-items: flex-start; gap: 0.75rem; }
+.casilla input { width: 1.75rem; height: 1.75rem; margin: 0.2rem 0 0; flex: none; accent-color: var(--acento); }
+
+.ayuda { font-size: 1.05rem; }
+
+.mensajes {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0;
+}
+.mensaje {
+  padding: 0.75rem 1rem;
+  border-radius: 0.4rem;
+  border-left: 6px solid var(--linea);
+}
+.mensaje + .mensaje { margin-top: 0.75rem; }
+.mensaje p { margin: 0; }
+.mensaje .quien { font-weight: 700; }
+.mensaje-asistente { background: var(--suave); border-left-color: var(--acento); }
+.mensaje-error { border-left-color: var(--error); }
+.mensaje-error .quien { color: var(--error); }
+.nota { margin-top: 0.4rem !important; font-style: italic; }
+
+.formulario { margin-top: 1.5rem; }
+.formulario label { display: block; font-weight: 700; }
+textarea {
+  display: block;
+  width: 100%;
+  font: inherit;
+  padding: 0.6rem 0.75rem;
+  border: 2px solid var(--tinta);
+  border-radius: 0.4rem;
+  background: var(--papel);
+  color: var(--tinta);
+  resize: vertical;
+}
+textarea[aria-invalid="true"] { border-color: var(--error); border-width: 3px; }
+.error { color: var(--error); font-weight: 700; margin: 0.4rem 0 0; }
+button[aria-disabled="true"] { opacity: 0.55; cursor: progress; }
+
+/* Descargas */
+.descarga { margin-top: 2rem; }
+.suma { font-family: Consolas, "Courier New", monospace; font-size: 0.95rem; word-break: break-all; }
+
+main > .contenedor > h1 { margin-top: 2rem; }

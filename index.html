@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://accounts.google.com/gsi/client; style-src 'self' https://accounts.google.com/gsi/style; frame-src https://accounts.google.com/gsi/; connect-src 'self' https://*.onrender.com https://accounts.google.com/gsi/; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Asistente de voz de CECAPI</title>
+  <meta name="description" content="Conversa por escrito con el asistente de CECAPI para personas ciegas y con baja visión.">
+  <link rel="preload" href="assets/fuentes/atkinson-hyperlegible-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/sitio.v1.css">
+  <link rel="stylesheet" href="assets/css/asistente.v1.css">
+  <script src="assets/js/preferencias.v1.js"></script>
+  <script src="assets/js/lectura.v1.js" defer></script>
+  <script src="assets/js/config.v1.js" defer></script>
+  <script src="assets/js/api.v1.js" defer></script>
+  <script src="assets/js/asistente.v1.js" defer></script>
+</head>
+<body>
+  <a class="salto" href="#contenido">Saltar al contenido</a>
+
+  <header class="cabecera">
+    <div class="contenedor">
+      <a class="marca" href="./">Asistente CECAPI</a>
+      <nav class="navegacion" aria-label="Principal">
+        <ul>
+          <li><a href="./" aria-current="page">Asistente</a></li>
+          <li><a href="descargas.html">Descargar apps</a></li>
+          <li><a href="politicas.html">Políticas</a></li>
+          <li><a href="https://fernandezquintanajose.github.io/PaginaCECAPI/">Sitio de CECAPI</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="ajustes" aria-labelledby="titulo-ajustes">
+    <div class="contenedor">
+      <h2 id="titulo-ajustes">Ajustes de lectura</h2>
+      <button type="button" id="texto-menos">Texto más chico</button>
+      <button type="button" id="texto-mas">Texto más grande</button>
+      <button type="button" id="contraste" aria-pressed="false">Contraste alto</button>
+      <p id="aviso-ajustes" class="solo-lector" role="status"></p>
+    </div>
+  </section>
+
+  <main id="contenido" tabindex="-1">
+    <div class="contenedor">
+      <h1>Asistente de CECAPI</h1>
+      <p>Escribe una pregunta y el asistente te responde en español, con frases cortas. Funciona con inteligencia artificial, así que puede equivocarse.</p>
+
+      <noscript>
+        <p class="pendiente">El asistente necesita JavaScript activado en el navegador.</p>
+      </noscript>
+
+      <p id="estado-servidor" class="estado" role="status" hidden></p>
+
+      <!-- Políticas: se leen por partes antes de usar el asistente. -->
+      <section id="politicas" class="panel" aria-labelledby="titulo-politicas" hidden>
+        <h2 id="titulo-politicas">Antes de empezar: políticas de uso y privacidad</h2>
+        <p>Léelas por partes con los botones. Para usar el asistente hay que llegar al final, declarar que eres mayor de edad y aceptarlas. Pasar las partes sin leerlas no cuenta como aceptar.</p>
+        <p><a href="politicas.html">Leer todo el texto en una sola página</a></p>
+
+        <div class="lector-politica">
+          <p id="politica-progreso" class="progreso" aria-hidden="true"></p>
+          <div id="politica-parte" class="parte"></div>
+        </div>
+
+        <div class="botonera">
+          <button type="button" id="politica-escuchar" aria-pressed="false">Escuchar en voz alta</button>
+          <button type="button" id="politica-repetir">Repetir</button>
+          <button type="button" id="politica-siguiente">Siguiente</button>
+        </div>
+
+        <fieldset id="politica-decision" class="decision">
+          <legend>Tu decisión</legend>
+          <p class="casilla">
+            <input type="checkbox" id="politica-edad">
+            <label for="politica-edad">Declaro que tengo 18 años o más.</label>
+          </p>
+          <p id="politica-requisito" class="ayuda"></p>
+          <div class="botonera">
+            <button type="button" id="politica-aceptar" class="boton-principal" aria-describedby="politica-requisito">Aceptar</button>
+            <button type="button" id="politica-rechazar">Rechazar</button>
+            <button type="button" id="politica-despues">Después</button>
+          </div>
+        </fieldset>
+      </section>
+
+      <section id="sin-aceptar" class="panel" aria-labelledby="titulo-sin-aceptar" hidden tabindex="-1">
+        <h2 id="titulo-sin-aceptar">El asistente está en pausa</h2>
+        <p id="sin-aceptar-motivo"></p>
+        <button type="button" id="volver-politicas">Leer las políticas</button>
+      </section>
+
+      <!-- Cuenta -->
+      <section id="cuenta" class="panel" aria-labelledby="titulo-cuenta" hidden>
+        <h2 id="titulo-cuenta">Tu cuenta</h2>
+        <p id="cuenta-estado"></p>
+        <div id="boton-google"></div>
+        <button type="button" id="cerrar-sesion" hidden>Cerrar sesión</button>
+      </section>
+
+      <!-- Chat -->
+      <section id="chat" aria-labelledby="titulo-chat" hidden>
+        <h2 id="titulo-chat">Conversación</h2>
+        <p id="chat-vacio">Todavía no hay mensajes. Escribe tu primera pregunta abajo.</p>
+        <ol id="mensajes" class="mensajes"></ol>
+        <p id="anuncio" class="solo-lector" aria-live="polite"></p>
+
+        <form id="formulario" class="formulario" novalidate>
+          <label for="pregunta">Tu pregunta</label>
+          <p id="pregunta-ayuda" class="ayuda">No escribas datos personales como tu correo, teléfono, CURP, domicilio o datos de salud.</p>
+          <textarea id="pregunta" name="pregunta" rows="3" maxlength="2000" aria-describedby="pregunta-ayuda pregunta-error"></textarea>
+          <p id="pregunta-error" class="error" hidden></p>
+          <div class="botonera">
+            <button type="submit" id="enviar" class="boton-principal">Enviar pregunta</button>
+            <button type="button" id="voz-respuestas" aria-pressed="false">Leer respuestas en voz alta</button>
+            <button type="button" id="tono-espera" aria-pressed="true">Tono de espera</button>
+            <button type="button" id="borrar">Borrar conversación</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <footer class="pie">
+    <div class="contenedor">
+      <ul>
+        <li><a href="politicas.html">Políticas de uso y privacidad</a></li>
+        <li><a href="descargas.html">Descargar apps</a></li>
+      </ul>
+      <p>Centro de Capacitación para Invidentes A. C., Durango.</p>
+    </div>
+  </footer>
+</body>
+</html>

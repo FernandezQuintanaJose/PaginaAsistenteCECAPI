@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Políticas de uso y privacidad, Asistente CECAPI</title>
+  <meta name="description" content="Políticas de uso y aviso de privacidad del asistente de CECAPI y sus apps.">
+  <link rel="preload" href="assets/fuentes/atkinson-hyperlegible-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/sitio.v1.css">
+  <script src="assets/js/preferencias.v1.js"></script>
+  <script src="assets/js/lectura.v1.js" defer></script>
+</head>
+<body>
+  <a class="salto" href="#contenido">Saltar al contenido</a>
+
+  <header class="cabecera">
+    <div class="contenedor">
+      <a class="marca" href="./">Asistente CECAPI</a>
+      <nav class="navegacion" aria-label="Principal">
+        <ul>
+          <li><a href="./">Asistente</a></li>
+          <li><a href="descargas.html">Descargar apps</a></li>
+          <li><a href="politicas.html" aria-current="page">Políticas</a></li>
+          <li><a href="https://fernandezquintanajose.github.io/PaginaCECAPI/">Sitio de CECAPI</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="ajustes" aria-labelledby="titulo-ajustes">
+    <div class="contenedor">
+      <h2 id="titulo-ajustes">Ajustes de lectura</h2>
+      <button type="button" id="texto-menos">Texto más chico</button>
+      <button type="button" id="texto-mas">Texto más grande</button>
+      <button type="button" id="contraste" aria-pressed="false">Contraste alto</button>
+      <button type="button" id="escuchar" aria-pressed="false">Escuchar esta página</button>
+      <span id="controles-lectura" hidden>
+        <button type="button" id="lectura-repetir">Repetir párrafo</button>
+        <button type="button" id="lectura-siguiente">Siguiente párrafo</button>
+      </span>
+      <p id="aviso-ajustes" class="solo-lector" role="status"></p>
+    </div>
+  </section>
+
+  <main id="contenido" tabindex="-1">
+    <div class="contenedor">
+      <h1>Políticas de uso y privacidad</h1>
+      <p class="pendiente" data-sin-lectura>Borrador del 28 de octubre de 2026, basado en la Ley Federal de Protección de Datos Personales en Posesión de los Particulares. Debe revisarlo un asesor legal antes de publicarse. No sustituye asesoría legal. Los datos entre corchetes están pendientes.</p>
+
+      <!-- Cada <section class="parte-politica"> es una parte que el asistente lee por separado.
+           Al cambiar el texto, cambiar también data-version: quien ya aceptó tendrá que aceptar de nuevo. -->
+      <article id="texto-politicas" data-version="2026-10-28-borrador">
+        <section class="parte-politica">
+          <h2>Qué es el asistente</h2>
+          <p>El asistente de CECAPI responde preguntas en español usando inteligencia artificial. Funciona en esta página, en la app para Android y en la app para Windows.</p>
+          <p>Es solo para personas de 18 años o más.</p>
+        </section>
+
+        <section class="parte-politica">
+          <h2>Quién es responsable de tus datos</h2>
+          <p>Responsable: [nombre, domicilio y correo de contacto, por definir con CECAPI].</p>
+        </section>
+
+        <section class="parte-politica">
+          <h2>Qué datos usamos</h2>
+          <p>Las preguntas que escribes o dices, y las respuestas que recibes.</p>
+          <p>Si inicias sesión con Google: tu nombre, tu correo y el identificador de tu cuenta de Google.</p>
+          <p>La fecha en que aceptas estas políticas y la versión que aceptaste.</p>
+          <p>Cuántas preguntas haces al día, para repartir el uso entre todas las personas.</p>
+        </section>
+
+        <section class="parte-politica">
+          <h2>Datos personales en tus preguntas</h2>
+          <p>No escribas datos personales en tus preguntas. El asistente bloquea las preguntas que traen correo, teléfono, número de tarjeta, CURP, RFC o contraseñas, y no las manda a la inteligencia artificial.</p>
+          <p>El asistente no detecta nombres, domicilios ni datos de salud. Si los escribes, sí se envían. Los datos sobre tu salud o una discapacidad se consideran datos sensibles.</p>
+        </section>
+
+        <section class="parte-politica">
+          <h2>Para qué los usamos</h2>
+          <p>Para responder tus preguntas, para que cada persona tenga un límite diario justo de uso y para guardar constancia de que aceptaste estas políticas.</p>
+          <p>No usamos tus datos para publicidad y no los vendemos.</p>
+        </section>
+
+        <section class="parte-politica">
+          <h2>Con quién se comparten</h2>
+          <p>Para generar la respuesta, tu pregunta se envía a uno de dos servicios de inteligencia artificial: Gemini, de Google, o Groq.</p>
+          <p>Usamos la versión gratuita de Gemini. En esa versión, Google puede usar el contenido de las preguntas para mejorar sus productos.</p>
+          <p>El servidor del asistente funciona en Render y la base de datos en Neon. Estos servicios pueden estar fuera de México. [Ubicación por confirmar].</p>
+        </section>
+
+        <section class="parte-politica">
+          <h2>Cuánto tiempo guardamos los datos</h2>
+          <p>[Plazo por definir]. Buscamos guardar lo mínimo: de preguntas y respuestas, idealmente nada.</p>
+          <p>Al cerrar sesión, esta página borra la conversación y tu sesión de este navegador.</p>
+        </section>
+
+        <section class="parte-politica">
+          <h2>Tus derechos</h2>
+          <p>Puedes pedir acceso a tus datos, corregirlos, cancelarlos u oponerte a su uso. También puedes retirar tu consentimiento.</p>
+          <p>Para hacerlo, escribe a [correo de contacto, por definir].</p>
+        </section>
+
+        <section class="parte-politica">
+          <h2>Límites del asistente</h2>
+          <p>Las respuestas las genera una inteligencia artificial y pueden tener errores. No sustituyen la opinión de un médico, un abogado u otro profesional.</p>
+          <p>En una emergencia, llama al 911.</p>
+        </section>
+
+        <section class="parte-politica">
+          <h2>Cambios a estas políticas</h2>
+          <p>Si estas políticas cambian, te las volveremos a mostrar y tendrás que aceptarlas de nuevo para seguir usando el asistente.</p>
+        </section>
+      </article>
+    </div>
+  </main>
+
+  <footer class="pie">
+    <div class="contenedor">
+      <ul>
+        <li><a href="./">Volver al asistente</a></li>
+        <li><a href="descargas.html">Descargar apps</a></li>
+      </ul>
+      <p>Centro de Capacitación para Invidentes A. C., Durango.</p>
+    </div>
+  </footer>
+</body>
+</html>
