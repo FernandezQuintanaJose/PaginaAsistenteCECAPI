@@ -1,4 +1,4 @@
-// Página del asistente: políticas por partes, cuenta de Google y chat.
+// Página del asistente: políticas por partes, cuenta propia (usuario o correo y contraseña) y chat.
 // Todo texto que viene del servidor se inserta con textContent, nunca como HTML.
 (function () {
   "use strict";
@@ -149,73 +149,297 @@
   }
 
   // ------------------------------------------------------------------ Cuenta
+  // Cuenta propia: nombre de usuario o correo y contraseña. El código que llega al correo
+  // se usa solo al registrarse y al recuperar la contraseña. No hay acceso con Google.
+  var FORMULARIOS = ["f-acceso", "f-registro", "f-codigo", "f-recuperar", "f-restablecer"];
+  var correoPendiente = "";
+  var formularioActual = null;
+  var abrioConfirmacion = null;
+
   function estadoCuenta(texto) { $("cuenta-estado").textContent = texto; }
-
-  function chatPermitido() { return config.permitirSinCuenta || api.conSesion(); }
-
-  function actualizarChat() {
-    var permitido = chatPermitido();
-    $("chat").hidden = !permitido;
-    if (!permitido) estadoCuenta("Inicia sesión con Google para usar el asistente.");
+  function cuentasDisponibles() { return api.cuentasDisponibles(); }
+  function chatPermitido() {
+    return api.conSesion() || (!cuentasDisponibles() && config.permitirSinCuenta);
   }
 
-  function alRecibirCredencial(respuesta) {
-    if (!config.rutas.sesion) {
-      estadoCuenta("El servidor todavía no acepta cuentas." +
-        (config.permitirSinCuenta ? " Puedes seguir usando el asistente sin cuenta." : ""));
-      return;
+  function ocultarFormularios() {
+    FORMULARIOS.forEach(function (id) { $(id).hidden = true; });
+  }
+
+  function limpiarErrores(formulario) {
+    var error = formulario.querySelector(".error");
+    if (error) { error.textContent = ""; error.hidden = true; }
+    Array.prototype.forEach.call(formulario.querySelectorAll("[aria-invalid]"), function (c) { c.removeAttribute("aria-invalid"); });
+  }
+
+  // Muestra el error en el formulario, marca el campo y le lleva el foco.
+  function falla(formulario, texto, campo) {
+    var error = formulario.querySelector(".error");
+    error.textContent = texto;
+    error.hidden = false;
+    if (campo) { campo.setAttribute("aria-invalid", "true"); campo.focus(); }
+  }
+
+  function mostrarFormulario(id, conFoco) {
+    ocultarFormularios();
+    formularioActual = id;
+    var formulario = $(id);
+    limpiarErrores(formulario);
+    formulario.hidden = false;
+    Array.prototype.forEach.call($("cuenta-modos").querySelectorAll("[data-modo]"), function (b) {
+      b.setAttribute("aria-pressed", String(b.getAttribute("data-modo") === id));
+    });
+    if (conFoco) formulario.querySelector("h3").focus();
+  }
+
+  function refrescarCuenta() {
+    var sesion = api.conSesion();
+    var disponibles = cuentasDisponibles();
+    $("cuenta-sesion").hidden = !sesion;
+    $("cuenta-modos").hidden = sesion || !disponibles;
+    if (!sesion) $("confirmar").hidden = true;
+    if (sesion || !disponibles) ocultarFormularios();
+    else if (!formularioActual || $(formularioActual).hidden) mostrarFormulario(formularioActual || "f-acceso", false);
+    $("ir-recuperar").hidden = !config.verificacionPorCorreo;
+    if (sesion) return;
+    if (!disponibles) {
+      estadoCuenta("Las cuentas todavía no están disponibles en el servidor." +
+        (config.permitirSinCuenta ? " Mientras tanto puedes usar el asistente sin cuenta." : ""));
+    } else if (!$("cuenta-estado").textContent) {
+      estadoCuenta("Inicia sesión o crea una cuenta para usar el asistente.");
     }
-    estadoCuenta("Iniciando sesión.");
-    api.iniciarSesion(respuesta.credential).then(function (datos) {
-      estadoCuenta("Sesión iniciada" + (datos.nombre ? " como " + datos.nombre : "") + ".");
-      $("boton-google").hidden = true;
-      $("cerrar-sesion").hidden = false;
-      var registro = aceptacionVigente();
-      if (registro) api.registrarAceptacion(registro).catch(function () {});
-      actualizarChat();
-      $("cerrar-sesion").focus();
-    }, function (error) {
-      estadoCuenta(error.message);
+  }
+
+  function actualizarChat() {
+    $("chat").hidden = !chatPermitido();
+    refrescarCuenta();
+  }
+
+  function alIniciarSesion(datos) {
+    estadoCuenta("Sesión iniciada" + (datos.usuario ? " como " + datos.usuario : "") + ".");
+    anunciar($("cuenta-estado").textContent);
+    var registro = aceptacionVigente();
+    if (registro) api.registrarAceptacion(registro).catch(function () { /* se reintenta en el próximo inicio */ });
+    formularioActual = null;
+    actualizarChat();
+    $("pregunta").focus();
+  }
+
+  // Envía un formulario: valida, bloquea el botón mientras espera y muestra el error del servidor.
+  function conectar(id, validar, enviar) {
+    var formulario = $(id);
+    formulario.addEventListener("submit", function (evento) {
+      evento.preventDefault();
+      if (formulario.getAttribute("aria-busy") === "true") return;
+      limpiarErrores(formulario);
+      var problema = validar(formulario);
+      if (problema) { falla(formulario, problema.texto, problema.campo); return; }
+      var boton = formulario.querySelector("button[type=submit]");
+      formulario.setAttribute("aria-busy", "true");
+      boton.setAttribute("aria-disabled", "true");
+      Promise.resolve(enviar(formulario)).then(null, function (error) {
+        falla(formulario, error.message, null);
+        formulario.querySelector(".error").focus();
+      }).then(function () {
+        formulario.removeAttribute("aria-busy");
+        boton.removeAttribute("aria-disabled");
+      });
     });
   }
 
+  function errorUsuario(valor) {
+    var largo = valor.length >= config.usuarioMinimo && valor.length <= config.usuarioMaximo;
+    if (largo && /^[A-Za-z0-9._]+$/.test(valor)) return null;
+    return "El nombre de usuario debe tener entre " + config.usuarioMinimo + " y " + config.usuarioMaximo +
+      " caracteres: letras sin acento, números, punto o guion bajo.";
+  }
+  function errorCorreo(valor) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor) ? null : "Escribe un correo válido, por ejemplo nombre@correo.com.";
+  }
+  function errorContrasena(valor) {
+    return valor.length >= config.contrasenaMinima ? null :
+      "La contraseña debe tener al menos " + config.contrasenaMinima + " caracteres. Puede ser una frase.";
+  }
+  function campo(formulario, nombre) { return formulario.elements[nombre]; }
+  function valor(formulario, nombre) { return campo(formulario, nombre).value.trim(); }
+
   function prepararCuenta() {
     $("cuenta").hidden = false;
-    if (!config.googleClientId) {
-      estadoCuenta("El inicio de sesión con Google todavía no está disponible." +
-        (config.permitirSinCuenta ? " Mientras tanto puedes usar el asistente sin cuenta." : ""));
-      return;
-    }
-    estadoCuenta(config.permitirSinCuenta
-      ? "Puedes usar el asistente sin cuenta o iniciar sesión con Google."
-      : "Inicia sesión con Google para usar el asistente.");
-    var script = document.createElement("script");
-    script.src = "https://accounts.google.com/gsi/client";
-    script.async = true;
-    script.onload = function () {
-      window.google.accounts.id.initialize({
-        client_id: config.googleClientId,
-        callback: alRecibirCredencial,
-        auto_select: false,
-        cancel_on_tap_outside: true
-      });
-      window.google.accounts.id.renderButton($("boton-google"), {
-        type: "standard", theme: "outline", size: "large", text: "signin_with", locale: "es-419"
-      });
-    };
-    script.onerror = function () { estadoCuenta("No se pudo cargar el inicio de sesión de Google. Revisa tu conexión."); };
-    document.head.appendChild(script);
+    $("politica-requisito").textContent = "";
 
+    Array.prototype.forEach.call(document.querySelectorAll("[data-modo]"), function (b) {
+      b.addEventListener("click", function () { estadoCuenta(""); mostrarFormulario(b.getAttribute("data-modo"), true); });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("[data-ir]"), function (b) {
+      b.addEventListener("click", function () { mostrarFormulario(b.getAttribute("data-ir"), true); });
+    });
+    // "Mostrar contraseña": un solo control por formulario.
+    Array.prototype.forEach.call(document.querySelectorAll("[data-mostrar]"), function (casilla) {
+      casilla.addEventListener("change", function () {
+        Array.prototype.forEach.call(casilla.form.querySelectorAll("[data-clave]"), function (c) {
+          c.type = casilla.checked ? "text" : "password";
+        });
+      });
+    });
+
+    conectar("f-acceso", function (f) {
+      if (!valor(f, "identificador")) return { texto: "Escribe tu correo o tu nombre de usuario.", campo: campo(f, "identificador") };
+      if (!campo(f, "contrasena").value) return { texto: "Escribe tu contraseña.", campo: campo(f, "contrasena") };
+      return null;
+    }, function (f) {
+      return api.acceder(valor(f, "identificador"), campo(f, "contrasena").value).then(function (datos) {
+        f.reset();
+        alIniciarSesion(datos);
+      });
+    });
+
+    conectar("f-registro", function (f) {
+      var e = errorUsuario(valor(f, "usuario")); if (e) return { texto: e, campo: campo(f, "usuario") };
+      e = errorCorreo(valor(f, "correo")); if (e) return { texto: e, campo: campo(f, "correo") };
+      e = errorContrasena(campo(f, "contrasena").value); if (e) return { texto: e, campo: campo(f, "contrasena") };
+      if (campo(f, "contrasena").value !== campo(f, "repetir").value) return { texto: "Las dos contraseñas no son iguales.", campo: campo(f, "repetir") };
+      if (!campo(f, "mayor").checked) return { texto: "Para crear la cuenta, marca que tienes 18 años o más.", campo: campo(f, "mayor") };
+      return null;
+    }, function (f) {
+      var correo = valor(f, "correo");
+      return api.registrar({
+        usuario: valor(f, "usuario"), correo: correo, contrasena: campo(f, "contrasena").value,
+        mayorDeEdad: true, version: versionPoliticas
+      }).then(function (r) {
+        f.reset();
+        if (config.verificacionPorCorreo && (!r || r.requiereCodigo !== false)) {
+          correoPendiente = correo;
+          $("codigo-aviso").textContent = "Te enviamos un código a " + correo + ". Escríbelo aquí para terminar de crear tu cuenta.";
+          mostrarFormulario("f-codigo", true);
+          anunciar($("codigo-aviso").textContent);
+        } else {
+          estadoCuenta("Tu cuenta se creó. Ahora inicia sesión.");
+          mostrarFormulario("f-acceso", true);
+        }
+      });
+    });
+
+    conectar("f-codigo", function (f) {
+      return valor(f, "codigo") ? null : { texto: "Escribe el código que te llegó al correo.", campo: campo(f, "codigo") };
+    }, function (f) {
+      return api.verificar(correoPendiente, valor(f, "codigo")).then(function (datos) {
+        f.reset();
+        alIniciarSesion(datos);
+      });
+    });
+
+    conectar("f-recuperar", function (f) {
+      var e = errorCorreo(valor(f, "correo")); return e ? { texto: e, campo: campo(f, "correo") } : null;
+    }, function (f) {
+      var correo = valor(f, "correo");
+      return api.recuperar(correo).then(function () {
+        correoPendiente = correo;
+        f.reset();
+        // La respuesta es la misma exista o no el correo, para no revelar quién tiene cuenta.
+        $("restablecer-aviso").textContent = "Si ese correo tiene una cuenta, le enviamos un código. Escríbelo aquí junto con tu nueva contraseña.";
+        mostrarFormulario("f-restablecer", true);
+        anunciar($("restablecer-aviso").textContent);
+      });
+    });
+
+    conectar("f-restablecer", function (f) {
+      if (!valor(f, "codigo")) return { texto: "Escribe el código que te llegó al correo.", campo: campo(f, "codigo") };
+      var e = errorContrasena(campo(f, "contrasena").value); if (e) return { texto: e, campo: campo(f, "contrasena") };
+      if (campo(f, "contrasena").value !== campo(f, "repetir").value) return { texto: "Las dos contraseñas no son iguales.", campo: campo(f, "repetir") };
+      return null;
+    }, function (f) {
+      return api.restablecer(correoPendiente, valor(f, "codigo"), campo(f, "contrasena").value).then(function () {
+        f.reset();
+        estadoCuenta("Tu contraseña cambió. Inicia sesión con la nueva.");
+        anunciar($("cuenta-estado").textContent);
+        mostrarFormulario("f-acceso", true);
+      });
+    });
+
+    // --- Sesión abierta: cerrar sesión, borrar chats y eliminar cuenta ---
     $("cerrar-sesion").addEventListener("click", function () {
       api.cerrarSesion();
-      if (window.google && window.google.accounts) window.google.accounts.id.disableAutoSelect();
       borrarConversacion();
-      $("cerrar-sesion").hidden = true;
-      $("boton-google").hidden = false;
       estadoCuenta("Cerraste sesión. Se borró la conversación de este navegador.");
+      anunciar($("cuenta-estado").textContent);
+      formularioActual = "f-acceso";
       actualizarChat();
-      $("titulo-cuenta").setAttribute("tabindex", "-1");
       $("titulo-cuenta").focus();
+    });
+
+    function pedirConfirmacion(opciones, quien) {
+      abrioConfirmacion = quien;
+      var panel = $("confirmar");
+      $("confirmar-titulo").textContent = opciones.titulo;
+      $("confirmar-texto").textContent = opciones.texto;
+      $("confirmar-clave").hidden = !opciones.contrasena;
+      $("confirmar-pass").value = "";
+      $("confirmar-error").hidden = true;
+      $("confirmar-error").textContent = "";
+      $("confirmar-pass").removeAttribute("aria-invalid");
+      $("confirmar-si").textContent = opciones.boton;
+      panel.hidden = false;
+      panel.alConfirmar = opciones.alConfirmar;
+      panel.contrasena = !!opciones.contrasena;
+      $("confirmar-titulo").focus();
+    }
+
+    $("borrar-chats").addEventListener("click", function () {
+      pedirConfirmacion({
+        titulo: "¿Borrar todos tus chats guardados?",
+        texto: "Se borran tus preguntas y respuestas guardadas en el servidor. Tu cuenta se queda. No se puede deshacer.",
+        boton: "Sí, borrar mis chats", contrasena: false,
+        alConfirmar: function () {
+          return api.borrarChats().then(function () {
+            borrarConversacion();
+            estadoCuenta("Se borraron tus chats guardados.");
+            anunciar($("cuenta-estado").textContent);
+          });
+        }
+      }, $("borrar-chats"));
+    });
+
+    $("eliminar-cuenta").addEventListener("click", function () {
+      pedirConfirmacion({
+        titulo: "¿Eliminar tu cuenta?",
+        texto: "Se borran tu cuenta y todos tus datos y chats del servidor. No se puede deshacer. Escribe tu contraseña para confirmar.",
+        boton: "Sí, eliminar mi cuenta", contrasena: true,
+        alConfirmar: function (contrasena) {
+          return api.eliminarCuenta(contrasena).then(function () {
+            borrarConversacion();
+            estadoCuenta("Tu cuenta y tus datos se eliminaron.");
+            anunciar($("cuenta-estado").textContent);
+            formularioActual = "f-registro";
+            actualizarChat();
+            $("titulo-cuenta").focus();
+          });
+        }
+      }, $("eliminar-cuenta"));
+    });
+
+    $("confirmar-no").addEventListener("click", function () {
+      $("confirmar").hidden = true;
+      if (abrioConfirmacion) abrioConfirmacion.focus();
+    });
+    $("confirmar-si").addEventListener("click", function () {
+      var panel = $("confirmar");
+      var error = $("confirmar-error");
+      var clave = $("confirmar-pass").value;
+      if (panel.contrasena && !clave) {
+        error.textContent = "Escribe tu contraseña para confirmar.";
+        error.hidden = false;
+        $("confirmar-pass").setAttribute("aria-invalid", "true");
+        $("confirmar-pass").focus();
+        return;
+      }
+      $("confirmar-si").setAttribute("aria-disabled", "true");
+      panel.alConfirmar(clave).then(function () {
+        panel.hidden = true;
+      }, function (e) {
+        error.textContent = e.message;
+        error.hidden = false;
+        error.focus();
+      }).then(function () { $("confirmar-si").removeAttribute("aria-disabled"); });
     });
   }
 

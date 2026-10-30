@@ -15,8 +15,12 @@
     return el;
   }
 
+  // Solo se aceptan enlaces a GitHub Releases (https://github.com/<dueño>/<repo>/releases/...).
   function seguro(url) {
-    try { return new URL(url).protocol === "https:"; } catch (e) { return false; }
+    try {
+      var u = new URL(url);
+      return u.protocol === "https:" && u.hostname === "github.com" && /^\/[^/]+\/[^/]+\/releases\//.test(u.pathname);
+    } catch (e) { return false; }
   }
 
   function tarjeta(app) {

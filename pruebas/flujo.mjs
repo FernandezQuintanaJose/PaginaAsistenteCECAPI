@@ -20,10 +20,10 @@ function revisar(condicion, descripcion) {
 const servidor = await servir(PUERTO);
 const navegador = await chromium.launch();
 const contexto = await navegador.newContext({ bypassCSP: false });
-const config = (await readFile(new URL("../assets/js/config.v1.js", import.meta.url), "utf8"))
+const config = (await readFile(new URL("../assets/js/config.v2.js", import.meta.url), "utf8"))
   .replace('apiBase: ""', `apiBase: "${API}"`)
   .replace("avisoDespertarMs: 4000", "avisoDespertarMs: 300");
-await contexto.route("**/assets/js/config.v1.js", (r) => r.fulfill({ contentType: "text/javascript", body: config }));
+await contexto.route("**/assets/js/config.v2.js", (r) => r.fulfill({ contentType: "text/javascript", body: config }));
 
 let respuestaSimulada = { status: 200, body: { respuesta: "Louis Braille inventó el sistema de lectura con puntos.", proveedor: "groq", hayMas: true }, espera: 800 };
 const recibidas = [];
@@ -110,7 +110,7 @@ errores.forEach((e) => console.log("   - " + e));
 
 // axe con el chat abierto. Otro contexto, porque la CSP (bien) bloquea inyectar axe.
 const contextoAxe = await navegador.newContext({ bypassCSP: true });
-await contextoAxe.route("**/assets/js/config.v1.js", (r) => r.fulfill({ contentType: "text/javascript", body: config }));
+await contextoAxe.route("**/assets/js/config.v2.js", (r) => r.fulfill({ contentType: "text/javascript", body: config }));
 await contextoAxe.route(`${API}/**`, (r) => r.fulfill({ headers: { "Access-Control-Allow-Origin": "*" }, json: {} }));
 await contextoAxe.addInitScript((r) => localStorage.setItem("cecapi.politicas", r), JSON.stringify(registro));
 const paginaAxe = await contextoAxe.newPage();

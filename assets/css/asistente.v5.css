@@ -1,5 +1,8 @@
 /* Piezas propias del asistente. Usa las variables de sitio.v5.css. */
 
+/* Los estilos de botones y bloques no deben anular el atributo hidden. */
+[hidden] { display: none !important; }
+
 .panel {
   margin-top: 2rem;
   padding: 1.25rem;
@@ -96,3 +99,31 @@ main > .contenedor > h1 { margin-top: 2rem; }
   .formulario .botonera { flex-direction: column; align-items: stretch; }
   .formulario .botonera button { justify-content: center; }
 }
+
+/* Formularios de cuenta */
+.form-cuenta { margin-top: 1.25rem; max-width: 36rem; }
+.form-cuenta h3 { margin-top: 0; }
+.form-cuenta label, .confirmar label { display: block; font-weight: 700; }
+.form-cuenta .ayuda { display: block; font-weight: 400; }
+input[type="text"], input[type="email"], input[type="password"] {
+  display: block;
+  width: 100%;
+  font: inherit;
+  min-height: 2.75rem;
+  padding: 0.4rem 0.75rem;
+  border: 1.5px solid var(--linea);
+  border-radius: 0.5rem;
+  background: var(--papel);
+  color: var(--tinta);
+}
+input[aria-invalid="true"] { border-color: var(--error); border-width: 3px; }
+.casilla label { display: inline; font-weight: 400; }
+.confirmar {
+  margin-top: 1.25rem;
+  padding: 1rem 1.25rem;
+  border-left: 4px solid var(--error);
+  background: var(--suave);
+  max-width: 36rem;
+}
+.confirmar h3 { margin-top: 0; }
+.confirmar[hidden], .form-cuenta[hidden] { display: none; }

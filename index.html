@@ -3,18 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://accounts.google.com/gsi/client; style-src 'self' https://accounts.google.com/gsi/style; frame-src https://accounts.google.com/gsi/; connect-src 'self' https://*.onrender.com https://accounts.google.com/gsi/; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self' https://*.onrender.com; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>Asistente de voz de CECAPI</title>
   <meta name="description" content="Conversa por escrito con el asistente de CECAPI para personas ciegas y con baja visión.">
   <link rel="preload" href="assets/fuentes/atkinson-hyperlegible-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/css/sitio.v5.css">
-  <link rel="stylesheet" href="assets/css/asistente.v4.css">
+  <link rel="stylesheet" href="assets/css/asistente.v5.css">
   <script src="assets/js/preferencias.v4.js"></script>
   <script src="assets/js/lectura.v2.js" defer></script>
-  <script src="assets/js/config.v1.js" defer></script>
-  <script src="assets/js/api.v1.js" defer></script>
-  <script src="assets/js/asistente.v1.js" defer></script>
+  <script src="assets/js/config.v2.js" defer></script>
+  <script src="assets/js/api.v2.js" defer></script>
+  <script src="assets/js/asistente.v2.js" defer></script>
 </head>
 <body>
   <a class="salto" href="#contenido">Saltar al contenido</a>
@@ -71,6 +71,7 @@
       </noscript>
 
       <p id="estado-servidor" class="estado" role="status" hidden></p>
+      <p id="anuncio" class="solo-lector" aria-live="polite"></p>
 
       <!-- Políticas: se leen por partes antes de usar el asistente. -->
       <section id="politicas" class="panel" aria-labelledby="titulo-politicas" hidden>
@@ -110,12 +111,108 @@
         <button type="button" id="volver-politicas">Leer las políticas</button>
       </section>
 
-      <!-- Cuenta -->
+      <!-- Cuenta propia: usuario o correo y contraseña. Sin acceso con Google. -->
       <section id="cuenta" class="panel" aria-labelledby="titulo-cuenta" hidden>
-        <h2 id="titulo-cuenta">Tu cuenta</h2>
-        <p id="cuenta-estado"></p>
-        <div id="boton-google"></div>
-        <button type="button" id="cerrar-sesion" hidden>Cerrar sesión</button>
+        <h2 id="titulo-cuenta" tabindex="-1">Tu cuenta</h2>
+        <p id="cuenta-estado" role="status"></p>
+
+        <div id="cuenta-modos" class="botonera" role="group" aria-label="Qué quieres hacer" hidden>
+          <button type="button" data-modo="f-acceso" aria-pressed="false">Iniciar sesión</button>
+          <button type="button" data-modo="f-registro" aria-pressed="false">Crear cuenta</button>
+          <button type="button" id="ir-recuperar" class="boton-texto" data-modo="f-recuperar" aria-pressed="false">Olvidé mi contraseña</button>
+        </div>
+
+        <form id="f-acceso" class="form-cuenta" novalidate hidden>
+          <h3 tabindex="-1">Iniciar sesión</h3>
+          <p><label for="acc-id">Correo o nombre de usuario</label>
+            <input id="acc-id" name="identificador" type="text" autocomplete="username" autocapitalize="none" spellcheck="false"></p>
+          <p><label for="acc-pass">Contraseña</label>
+            <input id="acc-pass" name="contrasena" type="password" autocomplete="current-password" data-clave></p>
+          <p class="casilla"><input type="checkbox" id="acc-mostrar" data-mostrar><label for="acc-mostrar">Mostrar contraseña</label></p>
+          <p class="error" role="alert" tabindex="-1" hidden></p>
+          <div class="botonera"><button type="submit" class="boton-principal">Iniciar sesión</button></div>
+        </form>
+
+        <form id="f-registro" class="form-cuenta" novalidate hidden>
+          <h3 tabindex="-1">Crear cuenta</h3>
+          <p><label for="reg-usuario">Nombre de usuario</label>
+            <span id="reg-usuario-ayuda" class="ayuda">De 3 a 30 caracteres: letras sin acento, números, punto o guion bajo.</span>
+            <input id="reg-usuario" name="usuario" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" aria-describedby="reg-usuario-ayuda"></p>
+          <p><label for="reg-correo">Correo electrónico</label>
+            <span id="reg-correo-ayuda" class="ayuda">Un código de confirmación llegará a este correo.</span>
+            <input id="reg-correo" name="correo" type="email" autocomplete="email" aria-describedby="reg-correo-ayuda"></p>
+          <p><label for="reg-pass">Contraseña</label>
+            <span id="reg-pass-ayuda" class="ayuda">Al menos 15 caracteres. Puede ser una frase fácil de recordar.</span>
+            <input id="reg-pass" name="contrasena" type="password" autocomplete="new-password" data-clave aria-describedby="reg-pass-ayuda"></p>
+          <p><label for="reg-pass2">Repite la contraseña</label>
+            <input id="reg-pass2" name="repetir" type="password" autocomplete="new-password" data-clave></p>
+          <p class="casilla"><input type="checkbox" id="reg-mostrar" data-mostrar><label for="reg-mostrar">Mostrar contraseñas</label></p>
+          <p class="casilla"><input type="checkbox" id="reg-mayor" name="mayor"><label for="reg-mayor">Declaro que tengo 18 años o más.</label></p>
+          <p class="error" role="alert" tabindex="-1" hidden></p>
+          <div class="botonera"><button type="submit" class="boton-principal">Crear cuenta</button></div>
+        </form>
+
+        <form id="f-codigo" class="form-cuenta" novalidate hidden>
+          <h3 tabindex="-1">Confirma tu correo</h3>
+          <p id="codigo-aviso"></p>
+          <p><label for="cod-codigo">Código</label>
+            <input id="cod-codigo" name="codigo" type="text" inputmode="numeric" autocomplete="one-time-code" spellcheck="false"></p>
+          <p class="error" role="alert" tabindex="-1" hidden></p>
+          <div class="botonera">
+            <button type="submit" class="boton-principal">Confirmar</button>
+            <button type="button" class="boton-texto" data-ir="f-registro">Volver</button>
+          </div>
+        </form>
+
+        <form id="f-recuperar" class="form-cuenta" novalidate hidden>
+          <h3 tabindex="-1">Recuperar tu contraseña</h3>
+          <p>Escribe el correo de tu cuenta. Te enviaremos un código para elegir una contraseña nueva.</p>
+          <p><label for="rec-correo">Correo electrónico</label>
+            <input id="rec-correo" name="correo" type="email" autocomplete="email"></p>
+          <p class="error" role="alert" tabindex="-1" hidden></p>
+          <div class="botonera">
+            <button type="submit" class="boton-principal">Enviar código</button>
+            <button type="button" class="boton-texto" data-ir="f-acceso">Volver</button>
+          </div>
+        </form>
+
+        <form id="f-restablecer" class="form-cuenta" novalidate hidden>
+          <h3 tabindex="-1">Elige una contraseña nueva</h3>
+          <p id="restablecer-aviso"></p>
+          <p><label for="res-codigo">Código</label>
+            <input id="res-codigo" name="codigo" type="text" inputmode="numeric" autocomplete="one-time-code" spellcheck="false"></p>
+          <p><label for="res-pass">Contraseña nueva</label>
+            <span id="res-pass-ayuda" class="ayuda">Al menos 15 caracteres.</span>
+            <input id="res-pass" name="contrasena" type="password" autocomplete="new-password" data-clave aria-describedby="res-pass-ayuda"></p>
+          <p><label for="res-pass2">Repite la contraseña nueva</label>
+            <input id="res-pass2" name="repetir" type="password" autocomplete="new-password" data-clave></p>
+          <p class="casilla"><input type="checkbox" id="res-mostrar" data-mostrar><label for="res-mostrar">Mostrar contraseñas</label></p>
+          <p class="error" role="alert" tabindex="-1" hidden></p>
+          <div class="botonera">
+            <button type="submit" class="boton-principal">Cambiar contraseña</button>
+            <button type="button" class="boton-texto" data-ir="f-acceso">Cancelar</button>
+          </div>
+        </form>
+
+        <div id="cuenta-sesion" hidden>
+          <div class="botonera">
+            <button type="button" id="cerrar-sesion">Cerrar sesión</button>
+            <button type="button" id="borrar-chats">Borrar mis chats guardados</button>
+            <button type="button" id="eliminar-cuenta" class="boton-texto">Eliminar mi cuenta</button>
+          </div>
+        </div>
+
+        <div id="confirmar" class="confirmar" role="group" aria-labelledby="confirmar-titulo" hidden>
+          <h3 id="confirmar-titulo" tabindex="-1"></h3>
+          <p id="confirmar-texto"></p>
+          <p id="confirmar-clave" hidden><label for="confirmar-pass">Contraseña</label>
+            <input id="confirmar-pass" type="password" autocomplete="current-password"></p>
+          <p id="confirmar-error" class="error" role="alert" tabindex="-1" hidden></p>
+          <div class="botonera">
+            <button type="button" id="confirmar-si" class="boton-principal"></button>
+            <button type="button" id="confirmar-no">Cancelar</button>
+          </div>
+        </div>
       </section>
 
       <!-- Chat -->
@@ -123,7 +220,6 @@
         <h2 id="titulo-chat">Conversación</h2>
         <p id="chat-vacio">Todavía no hay mensajes. Escribe tu primera pregunta abajo.</p>
         <ol id="mensajes" class="mensajes"></ol>
-        <p id="anuncio" class="solo-lector" aria-live="polite"></p>
 
         <form id="formulario" class="formulario" novalidate>
           <label for="pregunta">Tu pregunta</label>

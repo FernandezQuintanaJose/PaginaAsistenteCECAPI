@@ -4,7 +4,7 @@
     {
       "id": "android",
       "plataforma": "Android",
-      "nombre": "App CECAPI para Android",
+      "nombre": "App CECAPI para Android (APK)",
       "requisitos": "Android 8.0 o más reciente.",
       "version": null,
       "archivo": null,
@@ -15,7 +15,7 @@
     {
       "id": "windows",
       "plataforma": "Windows",
-      "nombre": "App CECAPI para Windows",
+      "nombre": "App CECAPI para Windows (.exe)",
       "requisitos": "Por definir tras la prueba técnica.",
       "version": null,
       "archivo": null,
