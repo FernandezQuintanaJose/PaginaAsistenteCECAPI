@@ -25,7 +25,7 @@ const config = (await readFile(new URL("../assets/js/config.v2.js", import.meta.
   .replace("avisoDespertarMs: 4000", "avisoDespertarMs: 300");
 await contexto.route("**/assets/js/config.v2.js", (r) => r.fulfill({ contentType: "text/javascript", body: config }));
 
-let respuestaSimulada = { status: 200, body: { respuesta: "Louis Braille inventó el sistema de lectura con puntos.", proveedor: "groq", hayMas: true }, espera: 800 };
+let respuestaSimulada = { status: 200, body: { respuesta: "Louis Braille inventó el sistema de lectura con puntos.", proveedor: "groq", hayMas: true, conversacionId: "c-1" }, espera: 800 };
 const recibidas = [];
 await contexto.route(`${API}/**`, async (r) => {
   const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "*", "Access-Control-Allow-Methods": "GET,POST" };
@@ -39,7 +39,7 @@ await contexto.route(`${API}/**`, async (r) => {
 const pagina = await contexto.newPage();
 const errores = [];
 pagina.on("pageerror", (e) => errores.push(e.message));
-pagina.on("console", (m) => { if (m.type() === "error" && !m.text().includes("429")) errores.push(m.text()); });
+pagina.on("console", (m) => { if (m.type() === "error" && !m.text().includes("429") && !m.text().includes("401")) errores.push(m.text()); });
 await pagina.goto(URL_SITIO, { waitUntil: "networkidle" });
 
 revisar(await pagina.isVisible("#abrir-ajustes") && await pagina.isHidden("#panel-ajustes"), "el panel de ajustes empieza cerrado");
@@ -100,6 +100,18 @@ await pagina.fill("#pregunta", "Otra pregunta");
 await pagina.click("#enviar");
 await pagina.waitForSelector(".mensaje-error");
 revisar((await pagina.textContent(".mensaje-error")).includes("muchas preguntas"), "muestra el mensaje del servidor en errores");
+respuestaSimulada = { status: 401, body: { detail: "La app no tiene permiso para usar el asistente." }, espera: 10 };
+await pagina.fill("#pregunta", "Una más");
+await pagina.click("#enviar");
+await pagina.waitForFunction(() => document.querySelectorAll(".mensaje-error").length === 2);
+revisar((await pagina.locator(".mensaje-error").last().textContent()).includes("todavía no acepta preguntas desde esta página"), "un 401 al preguntar explica que el servidor no acepta la página");
+await pagina.click("#borrar");
+await pagina.fill("#pregunta", "Empiezo otra");
+await pagina.click("#enviar");
+await pagina.waitForFunction(() => document.querySelectorAll(".mensaje-error").length === 1);
+revisar(recibidas[3] && recibidas[3].conversacionId === undefined, "Borrar conversación empieza una conversación nueva");
+revisar(recibidas[0] && recibidas[0].conversacionId === undefined, "la primera pregunta no lleva conversación");
+revisar(recibidas[1] && recibidas[1].conversacionId === "c-1", "la segunda pregunta sigue la conversación que dio el servidor");
 revisar(recibidas[1] && recibidas[1].contexto.length === 2 && recibidas[1].contexto[0].startsWith("Persona: "), "manda el contexto de la conversación");
 
 await pagina.reload({ waitUntil: "networkidle" });

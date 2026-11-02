@@ -515,6 +515,7 @@
 
   function borrarConversacion() {
     historial = [];
+    api.nuevaConversacion();
     $("mensajes").textContent = "";
     $("chat-vacio").hidden = false;
     voz.callar();

@@ -4,6 +4,8 @@
   "use strict";
   var config = window.CECAPI_CONFIG;
   var token = null; // Solo en memoria: se pierde al cerrar la pestaña, a propósito.
+  // La conversación en curso: el servidor la devuelve en cada respuesta y se manda en la siguiente.
+  var conversacionId = null;
 
   var MENSAJES = {
     sinServidor: "El servidor del asistente todavía no está configurado.",
@@ -12,7 +14,8 @@
     tardo: "El servidor tardó demasiado en responder. Intenta de nuevo en un momento.",
     invalida: "Los datos no son válidos. Revísalos e intenta de nuevo.",
     sesion: "Tu sesión terminó. Vuelve a iniciar sesión.",
-    general: "Algo falló en el servidor. Intenta de nuevo en un momento."
+    general: "Algo falló en el servidor. Intenta de nuevo en un momento.",
+    sinPermiso: "El servidor del asistente todavía no acepta preguntas desde esta página."
   };
 
   function peticion(metodo, ruta, cuerpo) {
@@ -37,6 +40,9 @@
         var detalle = datos && typeof datos.detail === "string" ? datos.detail : null;
         // 401 con sesión abierta: el token venció. Sin sesión (al iniciar) el servidor explica por qué.
         if (res.status === 401 && token) { token = null; throw new Error(detalle || MENSAJES.sesion); }
+        // Sin sesión, un 401 al preguntar es la clave de la app (X-Clave-App), que esta página no lleva.
+        // En las rutas de cuenta, el 401 trae su propio mensaje (por ejemplo, contraseña equivocada).
+        if (res.status === 401 && ruta === config.rutas.preguntar) throw new Error(MENSAJES.sinPermiso);
         if (res.status === 422) throw new Error(detalle || MENSAJES.invalida);
         throw new Error(detalle || MENSAJES.general);
       });
@@ -63,8 +69,14 @@
 
     salud: function () { return peticion("GET", rutas.salud); },
     preguntar: function (pregunta, contexto) {
-      return peticion("POST", rutas.preguntar, { pregunta: pregunta, contexto: contexto });
+      var cuerpo = { pregunta: pregunta, contexto: contexto };
+      if (conversacionId) cuerpo.conversacionId = conversacionId;
+      return peticion("POST", rutas.preguntar, cuerpo).then(function (datos) {
+        if (datos && datos.conversacionId) conversacionId = datos.conversacionId;
+        return datos;
+      });
     },
+    nuevaConversacion: function () { conversacionId = null; },
 
     registrar: function (datos) { return peticion("POST", rutas.registro, datos); },
     verificar: function (correo, codigo) {
@@ -85,6 +97,6 @@
     eliminarCuenta: function (contrasena) {
       return peticion("DELETE", rutas.eliminarCuenta, { contrasena: contrasena }).then(function (r) { token = null; return r; });
     },
-    cerrarSesion: function () { token = null; }
+    cerrarSesion: function () { token = null; conversacionId = null; }
   };
 })();

@@ -47,7 +47,9 @@ Cómo se ejecutan: `npm run revisar`, `npm run flujo`, `npm run cuenta`, `npm ru
 | H-02 | Enviar una pregunta con el servidor lento | Avisa que el servidor está despertando |
 | H-03 | Recibir una respuesta | Se muestra, se anuncia al lector de pantalla y quita el aviso |
 | H-04 | Respuesta de error del servidor (429) | Se muestra el mensaje del servidor |
-| H-05 | Segunda pregunta | Manda las líneas anteriores como contexto |
+| H-05 | Segunda pregunta | Manda las líneas anteriores como contexto y el `conversacionId` que dio el servidor |
+| H-06 | El servidor responde 401 al preguntar (falta la clave de la app) | Dice que el servidor todavía no acepta preguntas desde esta página |
+| H-07 | Borrar conversación y volver a preguntar | La pregunta ya no lleva `conversacionId`: empieza una conversación nueva |
 | A-01 | Abrir y cerrar el panel de ajustes | Empuja el contenido; Escape y tocar fuera lo cierran; Escape devuelve el foco al botón |
 | A-02 | Texto más grande, tema oscuro | La letra crece y el tema se aplica |
 

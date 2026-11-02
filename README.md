@@ -13,8 +13,8 @@ La ficha del proyecto está en `docs/FICHA.md`, las reglas comunes en `docs/FICH
 | `descargas.html` | Descargas con versión, tamaño y SHA-256, leídas de `datos/descargas.v1.json`. Solo enlaces a GitHub Releases |
 | `404.html` | Usa `<base href="/PaginaAsistenteCECAPI/">`; con dominio propio, cambiar a `/` |
 | `assets/js/config.v2.js` | Servidor, rutas y reglas de cuenta. Público: sin llaves |
-| `assets/js/api.v2.js` | Cliente del servidor con tiempo de espera y errores en español |
-| `assets/js/asistente.v2.js` | Lógica de la página: políticas, cuenta, chat |
+| `assets/js/api.v3.js` | Cliente del servidor con tiempo de espera y errores en español |
+| `assets/js/asistente.v3.js` | Lógica de la página: políticas, cuenta, chat |
 | `assets/css/`, `assets/fuentes/`, `preferencias.v4.js`, `lectura.v2.js` | Igual que en PaginaCECAPI (estilos del asistente en `asistente.v5.css`) |
 
 ## Cómo funciona
@@ -28,7 +28,7 @@ La ficha del proyecto está en `docs/FICHA.md`, las reglas comunes en `docs/FICH
 
 ## Contrato con el servidor (propuesta)
 
-Lo que la página espera. Si el servidor usa otras rutas o nombres, se cambian en `config.v2.js` y `api.v2.js`. Los errores deben traer `{ "detail": "texto en español" }`, porque ese texto se muestra y se lee en voz alta.
+Lo que la página espera. Si el servidor usa otras rutas o nombres, se cambian en `config.v2.js` y `api.v3.js`. Los errores deben traer `{ "detail": "texto en español" }`, porque ese texto se muestra y se lee en voz alta.
 
 | Ruta | Cuerpo | Respuesta | Notas |
 |---|---|---|---|
@@ -44,6 +44,15 @@ Lo que la página espera. Si el servidor usa otras rutas o nombres, se cambian e
 Si `verificacionPorCorreo` es `false`, `registro` debe responder `requiereCodigo: false` y la página pide iniciar sesión sin código. Tampoco se ofrece recuperar la contraseña.
 
 Reglas del servidor que esta página da por hechas (lista de verificación, puntos 2, 3, 7, 9, 12 y 13): contraseñas con Argon2id, sin borrado por inactividad, cupo por usuario (unas 10 personas con 20 a 23 consultas al día), CORS para el origen de GitHub Pages y manejo del error de Neon al llegar a su límite o al despertar.
+
+## Estado frente al servidor real (2 nov 2026)
+
+El servidor de `EstadiasAppMobil` en `main` (`b8e39d8`) ya está listo para Render y Neon. Esta página usa su `POST /preguntar` y sigue la misma conversación con `conversacionId`, como la app Android. **Todavía no puede conectarse desde el navegador** por dos cosas del servidor:
+
+1. **CORS:** `backend/main.py` no tiene `CORSMiddleware`. El navegador bloquea las respuestas de otro dominio (Render) a esta página (GitHub Pages).
+2. **Clave de la app:** en Render `CECAPI_CLAVE_APP` siempre tiene valor, y `/preguntar` pide `X-Clave-App`. Esta página no puede llevar esa clave: cualquiera vería el JavaScript. Si llega un 401, la página dice que el servidor todavía no acepta preguntas desde aquí.
+
+Opciones para el equipo del servidor (Módulo 3), a decidir: CORS solo para `https://fernandezquintanajose.github.io` y el dominio final, más una de estas: (a) aceptar peticiones sin clave solo desde ese origen y con un límite por minuto más bajo; (b) esperar las cuentas con token por usuario (ficha del backend, tarea 4), que es el control de verdad. Mientras tanto, `apiBase` queda vacío y la página avisa que el servidor no está configurado.
 
 ## Lo que falta y de quién depende
 
