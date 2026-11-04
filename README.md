@@ -13,8 +13,8 @@ La ficha del proyecto está en `docs/FICHA.md`, las reglas comunes en `docs/FICH
 | `descargas.html` | Descargas con versión, tamaño y SHA-256, leídas de `datos/descargas.v1.json`. Solo enlaces a GitHub Releases |
 | `404.html` | Usa `<base href="/PaginaAsistenteCECAPI/">`; con dominio propio, cambiar a `/` |
 | `assets/js/config.v2.js` | Servidor, rutas y reglas de cuenta. Público: sin llaves |
-| `assets/js/api.v3.js` | Cliente del servidor con tiempo de espera y errores en español |
-| `assets/js/asistente.v3.js` | Lógica de la página: políticas, cuenta, chat |
+| `assets/js/api.v4.js` | Cliente del servidor con tiempo de espera y errores en español |
+| `assets/js/asistente.v4.js` | Lógica de la página: políticas, cuenta, chat |
 | `assets/css/`, `assets/fuentes/`, `preferencias.v4.js`, `lectura.v2.js` | Igual que en PaginaCECAPI (estilos del asistente en `asistente.v5.css`) |
 
 ## Cómo funciona
@@ -28,7 +28,7 @@ La ficha del proyecto está en `docs/FICHA.md`, las reglas comunes en `docs/FICH
 
 ## Contrato con el servidor (propuesta)
 
-Lo que la página espera. Si el servidor usa otras rutas o nombres, se cambian en `config.v2.js` y `api.v3.js`. Los errores deben traer `{ "detail": "texto en español" }`, porque ese texto se muestra y se lee en voz alta.
+Lo que la página espera. Si el servidor usa otras rutas o nombres, se cambian en `config.v2.js` y `api.v4.js`. Los errores deben traer `{ "detail": "texto en español" }`, porque ese texto se muestra y se lee en voz alta.
 
 | Ruta | Cuerpo | Respuesta | Notas |
 |---|---|---|---|
@@ -84,6 +84,7 @@ npm run revisar    # axe (WCAG 2.2 AA), consola y recursos, en 5 tamaños de pan
 npm run flujo      # políticas, chat y panel de ajustes con un servidor simulado
 npm run cuenta     # registro, acceso, recuperar, borrar chats y eliminar cuenta con un servidor simulado
 npm run descargas  # panel de descargas
+npm run hostil     # servidor roto o malicioso, atajos de quien abusa del chat, localStorage manipulado
 ```
 
 Los casos de cada prueba están en `docs/CASOS_DE_PRUEBA.md`. Las pruebas automáticas no sustituyen probar con NVDA, JAWS (si hay acceso) y Narrator, ni con TalkBack en el teléfono.

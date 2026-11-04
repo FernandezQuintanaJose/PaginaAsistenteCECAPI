@@ -7,7 +7,8 @@
     "revisar": "node pruebas/revisar.mjs",
     "flujo": "node pruebas/flujo.mjs",
     "cuenta": "node pruebas/cuenta.mjs",
-    "descargas": "node pruebas/descargas.mjs"
+    "descargas": "node pruebas/descargas.mjs",
+    "hostil": "node pruebas/hostil.mjs"
   },
   "devDependencies": {
     "axe-core": "^4.10.2",

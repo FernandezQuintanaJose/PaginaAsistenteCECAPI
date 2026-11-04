@@ -58,7 +58,7 @@ Fecha: 30 oct 2026. Responsable de la lista: José Fernández Quintana. Revisado
 | N.º | Resultado | Archivo y línea | Nota |
 |---|---|---|---|
 | 24 | Parcial | `asistente.v2.js:285-330` | Chat, cuenta propia y aceptación listos en el cliente; faltan las rutas del servidor |
-| 25 | Cumple | `assets/js/descargas.v2.js:19` (solo `github.com/.../releases/`); `datos/descargas.v1.json` | Aún sin enlaces: no hay versiones publicadas |
+| 25 | Cumple | `assets/js/descargas.v3.js:19` (solo `github.com/.../releases/`); `datos/descargas.v1.json` | Aún sin enlaces: no hay versiones publicadas |
 | 26 | Cumple | `docs/CASOS_DE_PRUEBA.md`; `pruebas/` | Faltan las pruebas manuales con lectores de pantalla (sección 6) |
 
 ## E. Sitio CECAPI

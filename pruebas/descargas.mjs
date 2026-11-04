@@ -33,6 +33,12 @@ revisar((await p.textContent("main")).includes("No están en Google Play ni en l
 p = await abrir([app("windows", "http://github.com/x/y/releases/download/v1/app.exe"), app("android", "https://github.com/x/y/archive/main.zip")]);
 revisar((await p.locator("a.boton-principal").count()) === 0, "http o rutas fuera de releases se descartan");
 
+p = await abrir([app("windows", "https://github.com/otro-dueno/WindowsCECAPI/releases/download/v1/app.exe"), app("android", "https://github.com/FernandezQuintanaJose/OtroRepo/releases/download/v1/app.apk")]);
+revisar((await p.locator("a.boton-principal").count()) === 0, "un repositorio que no es de CECAPI se descarta aunque sea de releases");
+
+p = await abrir([app("windows", "https://usuario:clave@github.com/FernandezQuintanaJose/WindowsCECAPI/releases/download/v1/app.exe"), app("android", "https://github.com.evil.com/FernandezQuintanaJose/EstadiasAppMobil/releases/x")]);
+revisar((await p.locator("a.boton-principal").count()) === 0, "enlaces con usuario y contraseña o con dominio parecido se descartan");
+
 await navegador.close();
 servidor.close();
 process.exit(fallas ? 1 : 0);

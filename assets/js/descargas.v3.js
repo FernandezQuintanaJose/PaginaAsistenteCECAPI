@@ -15,11 +15,17 @@
     return el;
   }
 
-  // Solo se aceptan enlaces a GitHub Releases (https://github.com/<dueño>/<repo>/releases/...).
+  // Solo se aceptan enlaces a las versiones publicadas de los repositorios de CECAPI en GitHub Releases.
+  // Si los repositorios cambian de dueño, cambiar aquí el nombre.
+  var DUENO = "FernandezQuintanaJose";
+  var REPOS = ["EstadiasAppMobil", "WindowsCECAPI"];
+
   function seguro(url) {
     try {
       var u = new URL(url);
-      return u.protocol === "https:" && u.hostname === "github.com" && /^\/[^/]+\/[^/]+\/releases\//.test(u.pathname);
+      var partes = u.pathname.split("/");
+      return u.protocol === "https:" && u.hostname === "github.com" && u.username === "" && u.password === "" &&
+        partes[1] === DUENO && REPOS.indexOf(partes[2]) !== -1 && partes[3] === "releases";
     } catch (e) { return false; }
   }
 

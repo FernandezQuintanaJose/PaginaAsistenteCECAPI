@@ -509,7 +509,9 @@
 
   function contexto() {
     return historial.slice(-6).map(function (m) {
-      return (m.rol === "persona" ? "Persona: " : "Asistente: ") + m.texto.slice(0, 1000);
+      // El servidor acepta líneas de hasta 1000 caracteres, con el prefijo incluido.
+      var prefijo = m.rol === "persona" ? "Persona: " : "Asistente: ";
+      return prefijo + m.texto.slice(0, 1000 - prefijo.length);
     });
   }
 

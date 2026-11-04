@@ -72,7 +72,9 @@
       var cuerpo = { pregunta: pregunta, contexto: contexto };
       if (conversacionId) cuerpo.conversacionId = conversacionId;
       return peticion("POST", rutas.preguntar, cuerpo).then(function (datos) {
-        if (datos && datos.conversacionId) conversacionId = datos.conversacionId;
+        // Un 200 sin una respuesta de texto (por ejemplo, la página de un portal WiFi) no es una respuesta.
+        if (!datos || typeof datos.respuesta !== "string" || !datos.respuesta.trim()) throw new Error(MENSAJES.general);
+        if (typeof datos.conversacionId === "string") conversacionId = datos.conversacionId;
         return datos;
       });
     },
