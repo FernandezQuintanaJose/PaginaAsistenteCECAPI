@@ -7,7 +7,7 @@ Semana del 4 al 11 nov 2026. Lo que no se pudo comprobar se marca **SIN VERIFICA
 ```
 git clone https://github.com/FernandezQuintanaJose/PaginaAsistenteCECAPI.git
 cd PaginaAsistenteCECAPI
-git checkout qa/correcciones                # hasta que se fusione a main
+git checkout main                           # el trabajo ya está en main
 npm install
 npx playwright install chromium
 npm run revisar && npm run flujo && npm run cuenta && npm run descargas && npm run hostil
@@ -28,7 +28,7 @@ Reglas de trabajo:
 | A3 | **Rutas de cuenta**: llenar `config.rutas` cuando existan y decidir `permitirSinCuenta`. | `config.v2.js` | `npm run cuenta` pasa contra rutas reales o su simulación actualizada. |
 | A4 | **Políticas**: datos entre corchetes, correo ARCO confirmado por CECAPI y revisión legal. | `politicas.html` | Sin corchetes. Revisión legal por escrito. |
 | A5 | **Descargas**: cuando existan los Releases de Android y Windows, registrar versión, archivo, url, tamaño y SHA-256. | `datos/descargas.v1.json` | La página muestra los botones; `npm run descargas` pasa. |
-| A6 | **Fusionar** `qa/correcciones` a `main` y publicar en Pages. | GitHub | Abre en su URL. |
+| A6 | **Activar Pages** (rama `main`, carpeta raíz). El código ya está en `main`. | GitHub | Abre en su URL. |
 
 ## Prioridad 2 — Calidad
 
