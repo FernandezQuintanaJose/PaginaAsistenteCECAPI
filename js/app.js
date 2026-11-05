@@ -257,11 +257,13 @@ function cerrarPoliticas() {
   dialogo.close();
 }
 
-$('ver-politicas').addEventListener('click', () => {
+// Se muestra cada vez que se abre la página
+function pedirPoliticas() {
   pagina = 0;
   dialogo.showModal();
   mostrarPolitica();
-});
+}
+
 $('repetir').addEventListener('click', () => leer($('titulo-politica').textContent + '. ' + $('texto-politica').textContent));
 $('siguiente').addEventListener('click', () => { pagina++; mostrarPolitica(); });
 $('aceptar').addEventListener('click', () => {
@@ -271,7 +273,12 @@ $('aceptar').addEventListener('click', () => {
     return;
   }
   cerrarPoliticas();
+  $('mensaje').focus();
 });
-$('rechazar').addEventListener('click', cerrarPoliticas);
-$('despues').addEventListener('click', cerrarPoliticas);
-dialogo.addEventListener('cancel', () => speechSynthesis.cancel());
+$('rechazar').addEventListener('click', () => {
+  leer('Para usar CECAPI necesitas aceptar las políticas.');
+  $('paso-politica').textContent = 'Para usar CECAPI necesitas aceptar las políticas.';
+});
+// No se puede cerrar con Escape sin aceptar
+dialogo.addEventListener('cancel', (e) => e.preventDefault());
+pedirPoliticas();
