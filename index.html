@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Asistente CECAPI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+  <a href="#mensaje" class="saltar">Saltar al chat</a>
+
+  <header class="barra">
+    <span class="logo">CECAPI</span>
+    <nav aria-label="Principal">
+      <button type="button" data-vista="chat" aria-current="page">Chat</button>
+      <button type="button" id="ver-politicas">Políticas</button>
+    </nav>
+    <div class="ajustes" aria-label="Ajustes de lectura" role="group">
+      <button type="button" id="texto-menos" aria-label="Reducir tamaño de texto">A−</button>
+      <button type="button" id="texto-mas" aria-label="Aumentar tamaño de texto">A+</button>
+      <button type="button" id="contraste" aria-pressed="false">Alto contraste</button>
+      <!-- Aquí Google dibuja su botón oficial de "Iniciar sesión" -->
+      <div id="login-google" class="login-google"></div>
+      <!-- Se muestra cuando la persona ya inició sesión -->
+      <div id="usuario" class="usuario" hidden>
+        <img id="usuario-foto" alt="" width="32" height="32" referrerpolicy="no-referrer">
+        <span id="usuario-nombre"></span>
+        <button type="button" id="cerrar-sesion">Cerrar sesión</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Vista: Chat -->
+    <section id="vista-chat" class="vista" aria-labelledby="titulo-chat">
+      <div class="bienvenida">
+        <h1 id="titulo-chat">Asistente <span class="acento">CECAPI</span></h1>
+        <p>¿En qué te puedo ayudar hoy?</p>
+      </div>
+
+      <p id="aviso-servidor" class="aviso" hidden>
+        El servidor se está despertando. Esto puede tardar hasta un minuto; tu mensaje se enviará en cuanto esté listo.
+      </p>
+
+      <ol id="conversacion" class="conversacion" aria-label="Conversación">
+        <li class="msg ia">
+          <span class="autor">CECAPI</span>
+          <p>Hola, soy el asistente de CECAPI. ¿En qué te puedo ayudar?</p>
+        </li>
+      </ol>
+
+      <!-- Región que lee el lector de pantalla cuando llega una respuesta -->
+      <div id="anuncio" class="oculto" aria-live="polite"></div>
+
+      <form id="form-chat" class="entrada">
+        <label for="mensaje" class="oculto">Escribe tu mensaje</label>
+        <textarea id="mensaje" rows="2" placeholder="Escribe tu mensaje…" required></textarea>
+        <button type="button" id="microfono" class="microfono" aria-pressed="false" aria-label="Dictar mensaje por voz" title="Dictar mensaje por voz" hidden>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M8 21h8"/></svg>
+        </button>
+        <button type="submit">Enviar</button>
+      </form>
+    </section>
+
+    <!-- Vista: Descargas -->
+    <aside id="vista-descargas" class="descargas" aria-labelledby="titulo-descargas">
+      <h2 id="titulo-descargas">Descargas</h2>
+
+      <div class="con-info">
+        <a class="cuadrado" href="#" aria-describedby="info-apk">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3v12m0 0-5-5m5 5 5-5M5 21h14"/></svg>
+          <span class="plataforma">Android</span>
+          <span class="tipo">Descarga APK</span>
+        </a>
+        <dl id="info-apk" class="info" role="tooltip">
+          <dt>Versión</dt><dd>1.0.0</dd>
+          <dt>Tamaño</dt><dd>24 MB</dd>
+          <dt>SHA-256</dt><dd><code>3f9a…c21e</code></dd>
+        </dl>
+      </div>
+
+      <div class="con-info">
+        <a class="cuadrado" href="#" aria-describedby="info-win">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3v12m0 0-5-5m5 5 5-5M5 21h14"/></svg>
+          <span class="plataforma">Windows</span>
+          <span class="tipo">Descarga</span>
+        </a>
+        <dl id="info-win" class="info" role="tooltip">
+          <dt>Versión</dt><dd>1.0.0</dd>
+          <dt>Tamaño</dt><dd>58 MB</dd>
+          <dt>SHA-256</dt><dd><code>a7b2…90fd</code></dd>
+        </dl>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Ventana de políticas -->
+  <dialog id="politicas" aria-labelledby="titulo-politica">
+    <h2 id="titulo-politica" tabindex="-1"></h2>
+    <p id="texto-politica"></p>
+    <p class="paso" id="paso-politica"></p>
+
+    <div class="controles-audio" role="group" aria-label="Audio">
+      <button type="button" id="repetir">🔊 Repetir</button>
+      <button type="button" id="siguiente">Siguiente</button>
+    </div>
+
+    <label class="mayor">
+      <input type="checkbox" id="es-mayor"> Declaro que tengo 18 años o más
+    </label>
+
+    <div class="acciones">
+      <button type="button" id="aceptar" class="primario">Aceptar</button>
+      <button type="button" id="rechazar">Rechazar</button>
+      <button type="button" id="despues">Después</button>
+    </div>
+  </dialog>
+
+  <script src="https://accounts.google.com/gsi/client" async></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
