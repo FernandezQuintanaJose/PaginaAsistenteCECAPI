@@ -36,7 +36,7 @@ Reglas de trabajo:
 |---|---|---|
 | B1 | **Lectores de pantalla**: NVDA, Narrator y TalkBack. Recorrer chat, políticas, descargas y mensajes de error. Anotar en `docs/LECTORES.md` (crearlo). Las pruebas automáticas no sustituyen esto. | Lista de hallazgos con navegador y versión; corregidos los que impiden usar el chat. |
 | B2 | **Servidor dormido**: el plan gratuito tarda cerca de un minuto en despertar. Comprobar que el aviso hablado y el indicador de espera funcionan con el servidor real. | Probado con el servidor dormido. |
-| B3 | **Pruebas hostiles nuevas**: pegar texto enorme, HTML, emojis, enviar con el servidor caído, cerrar la pestaña a mitad de respuesta. Añadirlas a `pruebas/hostil.mjs`. | Cada caso nuevo tiene su prueba y pasa. |
+| B3 | ~~**Pruebas hostiles nuevas**~~ **Hecho el 5 nov** en `pruebas/hostil.mjs` (35 casos): texto de 100 000 caracteres pegado (el campo corta en 2000), emojis y secuencias raras, servidor caído y recargar a mitad de respuesta. HTML ya estaba (XSS). Queda cerrar la pestaña con el servidor aún respondiendo, que no se puede distinguir de recargar. | Pasa. |
 | B4 | **Navegadores**: Firefox, Safari de iPhone y Edge. **SIN VERIFICAR** hoy (las pruebas usan Chromium). | Lista de lo que falla. |
 
 ## Conectar con los demás equipos
