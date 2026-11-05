@@ -1,18 +1,6 @@
-// PROTOTIPO: todo es simulado. No hay servidor, ni login real, ni descargas reales.
+// PROTOTIPO: con API_URL vacía el chat es simulado (modo prueba). Las descargas aún no son reales.
 
 const $ = (id) => document.getElementById(id);
-
-/* ---------- Navegación entre vistas ---------- */
-document.querySelectorAll('[data-vista]').forEach((boton) => {
-  boton.addEventListener('click', () => {
-    const vista = boton.dataset.vista;
-    document.querySelectorAll('.vista').forEach((v) => (v.hidden = v.id !== 'vista-' + vista));
-    document.querySelectorAll('[data-vista]').forEach((b) => b.removeAttribute('aria-current'));
-    boton.setAttribute('aria-current', 'page');
-    if (vista === 'chat') $('mensaje').focus();
-    else $('titulo-descargas').focus();
-  });
-});
 
 /* ---------- Tamaño de texto y contraste ---------- */
 let tamano = 100;
@@ -27,51 +15,111 @@ $('contraste').addEventListener('click', (e) => {
   e.currentTarget.setAttribute('aria-pressed', activo);
 });
 
+/* ---------- Conexión con el servidor (API) ---------- */
+// Dirección del servidor de CECAPI, sin "/" al final. Ejemplo: 'https://api.cecapi.org'
+// Mientras esté vacía, la página funciona en MODO PRUEBA: respuestas simuladas.
+//
+// Lo que el servidor debe ofrecer:
+//   POST /auth/google  { credential }  → verifica el token con Google, crea una cookie
+//                                         de sesión HttpOnly + Secure + SameSite y
+//                                         responde { nombre, email, foto }
+//   GET  /auth/sesion                  → { nombre, email, foto } si la cookie es válida, si no 401
+//   POST /auth/salir                   → borra la cookie
+//   POST /chat         { mensaje }     → { respuesta }  (401 sin sesión, 429 si hay demasiados mensajes)
+//
+// La llave de la IA vive SOLO en el servidor. Nunca la pongas en este archivo.
+// En el servidor, CORS debe permitir solo el dominio de esta página (nunca "*")
+// y aceptar credenciales, porque la cookie viaja en cada llamada.
+const API_URL = '';
+const MODO_PRUEBA = !API_URL;
+
+const TIEMPO_NORMAL = 15000;   // 15 s
+const TIEMPO_CHAT = 60000;     // 60 s: el servidor puede estar "despertando"
+
+class ErrorApi extends Error {
+  constructor(tipo, mensaje) { super(mensaje); this.tipo = tipo; }
+}
+
+// Llama al servidor con tiempo de espera y convierte cualquier fallo en un mensaje claro.
+async function llamarApi(ruta, { datos, tiempo = TIEMPO_NORMAL } = {}) {
+  const control = new AbortController();
+  const reloj = setTimeout(() => control.abort(), tiempo);
+  try {
+    const r = await fetch(API_URL + ruta, {
+      method: datos === undefined ? 'GET' : 'POST',
+      headers: datos === undefined ? {} : { 'Content-Type': 'application/json' },
+      body: datos === undefined ? undefined : JSON.stringify(datos),
+      credentials: 'include', // envía la cookie de sesión; el token no se guarda en la página
+      signal: control.signal,
+    });
+    if (r.status === 401) throw new ErrorApi('sesion', 'Tu sesión terminó. Vuelve a iniciar sesión con Google.');
+    if (r.status === 429) throw new ErrorApi('limite', 'Enviaste muchos mensajes seguidos. Espera un momento e inténtalo de nuevo.');
+    if (!r.ok) throw new ErrorApi('servidor', 'El servidor tuvo un problema. Inténtalo de nuevo en un momento.');
+    return r.status === 204 ? null : await r.json();
+  } catch (e) {
+    if (e instanceof ErrorApi) throw e;
+    if (e.name === 'AbortError') throw new ErrorApi('tiempo', 'El servidor tardó demasiado en responder. Inténtalo de nuevo.');
+    throw new ErrorApi('red', 'No se pudo conectar con el servidor. Revisa tu conexión a internet.');
+  } finally {
+    clearTimeout(reloj);
+  }
+}
+
 /* ---------- Inicio de sesión con Google ---------- */
 // Pega aquí el "ID de cliente" que te da Google Cloud Console (ver instrucciones).
+// Este ID es público por diseño; no es una llave secreta.
 const GOOGLE_CLIENT_ID = '815992457051-jcnemqoj7idscjl2n4s5pqq91q8tunnv.apps.googleusercontent.com';
 
-const CLAVE_SESION = 'cecapi-sesion';
+// Datos de la persona que inició sesión. Solo en memoria: al recargar se pierden
+// y se recuperan desde la cookie del servidor (o con el inicio automático de Google).
+let sesion = null;
+
+// Versiones anteriores guardaban el token en localStorage: se borra si quedó.
+try { localStorage.removeItem('cecapi-sesion'); } catch {}
 
 // El "credential" de Google es un JWT: tres partes separadas por puntos.
-// La del medio trae los datos de la persona (nombre, email, foto…).
+// La del medio trae los datos de la persona. Solo se lee en MODO PRUEBA,
+// porque sin servidor nadie verifica que sea auténtico.
 function leerToken(token) {
   const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
   const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
-  return JSON.parse(new TextDecoder().decode(bytes)); // TextDecoder respeta tildes y ñ
+  const d = JSON.parse(new TextDecoder().decode(bytes)); // TextDecoder respeta tildes y ñ
+  return { nombre: d.given_name || d.name, email: d.email, foto: d.picture };
 }
 
 function mostrarUsuario(datos) {
-  $('usuario-nombre').textContent = datos.given_name || datos.name || datos.email;
-  $('usuario-nombre').title = datos.email;
-  $('usuario-foto').src = datos.picture || '';
-  $('usuario-foto').hidden = !datos.picture;
+  sesion = datos;
+  $('usuario-nombre').textContent = datos.nombre || datos.email;
+  $('usuario-nombre').title = datos.email || '';
+  $('usuario-foto').src = datos.foto || '';
+  $('usuario-foto').hidden = !datos.foto;
   $('usuario').hidden = false;
   $('login-google').hidden = true;
 }
 
 function mostrarLogin() {
+  sesion = null;
   $('usuario').hidden = true;
   $('login-google').hidden = false;
 }
 
-function alIniciarSesion(respuesta) {
-  // OJO: esto solo sirve para mostrar el nombre en la página. Cuando haya servidor,
-  // hay que enviarle respuesta.credential y que él lo verifique con Google.
-  const datos = leerToken(respuesta.credential);
-  try { localStorage.setItem(CLAVE_SESION, respuesta.credential); } catch {}
-  mostrarUsuario(datos);
-  $('anuncio').textContent = 'Sesión iniciada como ' + (datos.name || datos.email) + '.';
+async function alIniciarSesion(respuesta) {
+  try {
+    // Con servidor: él verifica el token con Google y crea la cookie de sesión.
+    const datos = MODO_PRUEBA
+      ? leerToken(respuesta.credential)
+      : await llamarApi('/auth/google', { datos: { credential: respuesta.credential } });
+    mostrarUsuario(datos);
+    $('anuncio').textContent = 'Sesión iniciada como ' + (datos.nombre || datos.email) + '.';
+  } catch (e) {
+    mostrarLogin();
+    $('anuncio').textContent = 'No se pudo iniciar sesión. ' + e.message;
+  }
 }
 
-function recuperarSesion() {
-  try {
-    const token = localStorage.getItem(CLAVE_SESION);
-    if (!token) return;
-    const datos = leerToken(token);
-    if (datos.exp * 1000 > Date.now()) mostrarUsuario(datos); // el token caduca en 1 hora
-    else localStorage.removeItem(CLAVE_SESION);
-  } catch { /* token dañado o almacenamiento bloqueado: se ignora */ }
+async function recuperarSesion() {
+  if (MODO_PRUEBA) return; // sin servidor, Google vuelve a iniciar sesión solo (auto_select)
+  try { mostrarUsuario(await llamarApi('/auth/sesion')); } catch { /* sin sesión: se muestra el botón */ }
 }
 
 function iniciarGoogle() {
@@ -91,28 +139,29 @@ function iniciarGoogle() {
     text: 'signin_with',
     locale: 'es',
   });
-  if ($('usuario').hidden) google.accounts.id.prompt(); // ventanita de "Continuar como…"
+  if (!sesion) google.accounts.id.prompt(); // ventanita de "Continuar como…"
 }
 
-$('cerrar-sesion').addEventListener('click', () => {
-  try { localStorage.removeItem(CLAVE_SESION); } catch {}
+$('cerrar-sesion').addEventListener('click', async () => {
+  if (!MODO_PRUEBA) { try { await llamarApi('/auth/salir', { datos: {} }); } catch { /* se cierra igual */ } }
   if (window.google?.accounts?.id) google.accounts.id.disableAutoSelect();
   mostrarLogin();
   $('anuncio').textContent = 'Sesión cerrada.';
 });
 
-recuperarSesion();
-// La librería de Google carga en paralelo: si ya está lista, se usa; si no, avisa al terminar.
-if (window.google?.accounts?.id) iniciarGoogle();
-else window.onGoogleLibraryLoad = iniciarGoogle;
+// Primero se pregunta al servidor si ya hay sesión; luego se carga el botón de Google.
+recuperarSesion().finally(() => {
+  if (window.google?.accounts?.id) iniciarGoogle();
+  else window.onGoogleLibraryLoad = iniciarGoogle;
+});
 
 /* ---------- Chat ---------- */
 const conversacion = $('conversacion');
-let primerMensaje = true;
+const botonEnviar = $('form-chat').querySelector('button[type="submit"]');
 
-function agregarMensaje(texto, quien) {
+function agregarMensaje(texto, quien, esError = false) {
   const li = document.createElement('li');
-  li.className = 'msg ' + quien;
+  li.className = 'msg ' + quien + (esError ? ' error' : '');
   li.innerHTML = `<span class="autor">${quien === 'ia' ? 'CECAPI' : 'Tú'}</span>`;
   const p = document.createElement('p');
   p.textContent = texto; // textContent evita inyectar HTML
@@ -121,29 +170,56 @@ function agregarMensaje(texto, quien) {
   li.scrollIntoView({ behavior: 'smooth', block: 'end' });
 }
 
+function responder(texto, esError = false) {
+  agregarMensaje(texto, 'ia', esError);
+  $('anuncio').textContent = (esError ? 'Aviso: ' : 'CECAPI responde: ') + texto; // lo lee el lector de pantalla
+}
+
+async function pedirRespuesta(texto) {
+  if (MODO_PRUEBA) {
+    await esperar(800);
+    return 'Esta es una respuesta de ejemplo. Aquí aparecerá lo que conteste la IA de CECAPI.';
+  }
+  // Si tarda más de 3 s, probablemente el servidor se está despertando: se avisa.
+  const avisoLento = setTimeout(() => {
+    $('aviso-servidor').hidden = false;
+    $('anuncio').textContent = 'El servidor se está despertando, espera un momento.';
+  }, 3000);
+  try {
+    const r = await llamarApi('/chat', { datos: { mensaje: texto }, tiempo: TIEMPO_CHAT });
+    return r.respuesta;
+  } finally {
+    clearTimeout(avisoLento);
+    $('aviso-servidor').hidden = true;
+  }
+}
+
 $('form-chat').addEventListener('submit', async (e) => {
   e.preventDefault();
   const campo = $('mensaje');
   const texto = campo.value.trim();
-  if (!texto) return;
+  if (!texto || botonEnviar.disabled) return;
+
+  // Sin sesión no se envía nada: así nadie usa la IA sin cuenta.
+  if (!sesion) {
+    responder('Para usar el chat, primero inicia sesión con Google (botón arriba a la derecha). Tu mensaje sigue en el cuadro de texto.', true);
+    return;
+  }
 
   agregarMensaje(texto, 'usuario');
   campo.value = '';
+  botonEnviar.disabled = true; // evita mensajes duplicados mientras se espera
 
-  // Simula que el servidor "se despierta" en el primer mensaje
-  if (primerMensaje) {
-    $('aviso-servidor').hidden = false;
-    $('anuncio').textContent = 'El servidor se está despertando, espera un momento.';
-    await esperar(2500);
-    $('aviso-servidor').hidden = true;
-    primerMensaje = false;
+  try {
+    responder(await pedirRespuesta(texto));
+  } catch (err) {
+    responder(err.message, true);
+    if (err.tipo === 'sesion') mostrarLogin();
+    if (!campo.value) campo.value = texto; // se devuelve el mensaje para reenviarlo
+  } finally {
+    botonEnviar.disabled = false;
+    campo.focus(); // el foco vuelve al cuadro de texto
   }
-
-  await esperar(800);
-  const respuesta = 'Esta es una respuesta de ejemplo. Aquí aparecerá lo que conteste la IA de CECAPI.';
-  agregarMensaje(respuesta, 'ia');
-  $('anuncio').textContent = 'CECAPI responde: ' + respuesta; // lo lee el lector de pantalla
-  campo.focus(); // el foco vuelve al cuadro de texto
 });
 
 $('mensaje').addEventListener('keydown', (e) => {
@@ -179,10 +255,10 @@ if (Reconocimiento && !navegadorSinDictado) {
     campo.placeholder = activo ? 'Escuchando… habla ahora' : 'Escribe tu mensaje…';
   };
 
-  boton.hidden = false;
   boton.addEventListener('click', () => {
     if (escuchando) { rec.stop(); return; }
     textoPrevio = campo.value.trim();
+    huboVoz = false;
     try { rec.start(); } catch { /* ya estaba iniciado */ }
   });
 
@@ -195,9 +271,11 @@ if (Reconocimiento && !navegadorSinDictado) {
     let dicho = '';
     for (const r of e.results) dicho += r[0].transcript;
     campo.value = (textoPrevio ? textoPrevio + ' ' : '') + dicho.trim();
+    if (dicho.trim()) huboVoz = true;
   });
 
   let errorDictado = '';
+  let huboVoz = false; // si se dictó algo en esta ronda
 
   rec.addEventListener('end', () => {
     marcar(false);
@@ -205,10 +283,12 @@ if (Reconocimiento && !navegadorSinDictado) {
       $('anuncio').textContent = errorDictado;
       if (!campo.value.trim()) campo.placeholder = errorDictado; // visible en pantalla
       errorDictado = '';
+    } else if (huboVoz && campo.value.trim()) {
+      // Al terminar de hablar, el mensaje se envía solo
+      $('anuncio').textContent = 'Dictado terminado. Enviando mensaje.';
+      $('form-chat').requestSubmit();
     } else {
-      $('anuncio').textContent = campo.value.trim()
-        ? 'Dictado terminado. Revisa el mensaje y pulsa Enviar.'
-        : 'No se escuchó nada.';
+      $('anuncio').textContent = 'No se escuchó nada.';
     }
     campo.focus();
   });
@@ -223,6 +303,14 @@ if (Reconocimiento && !navegadorSinDictado) {
     };
     if (e.error === 'aborted') return;
     errorDictado = mensajes[e.error] || 'No se pudo usar el micrófono.';
+  });
+} else {
+  // El botón se muestra igual; al pulsarlo avisa que este navegador no permite dictar.
+  $('microfono').addEventListener('click', () => {
+    const aviso = 'Este navegador no permite dictar por voz. Prueba con Chrome o Edge.';
+    $('anuncio').textContent = aviso;
+    $('mensaje').placeholder = aviso;
+    $('mensaje').focus();
   });
 }
 

@@ -14,9 +14,6 @@
 
   <header class="barra">
     <span class="logo">CECAPI</span>
-    <nav aria-label="Principal">
-      <button type="button" data-vista="chat" aria-current="page">Chat</button>
-    </nav>
     <div class="ajustes" aria-label="Ajustes de lectura" role="group">
       <button type="button" id="texto-menos" aria-label="Reducir tamaño de texto">A−</button>
       <button type="button" id="texto-mas" aria-label="Aumentar tamaño de texto">A+</button>
@@ -57,7 +54,7 @@
       <form id="form-chat" class="entrada">
         <label for="mensaje" class="oculto">Escribe tu mensaje</label>
         <textarea id="mensaje" rows="2" placeholder="Escribe tu mensaje…" required></textarea>
-        <button type="button" id="microfono" class="microfono" aria-pressed="false" aria-label="Dictar mensaje por voz" title="Dictar mensaje por voz" hidden>
+        <button type="button" id="microfono" class="microfono" aria-pressed="false" aria-label="Dictar mensaje por voz" title="Dictar mensaje por voz">
           <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M8 21h8"/></svg>
         </button>
         <button type="submit">Enviar</button>
