@@ -12,7 +12,7 @@ La ficha del proyecto está en `docs/FICHA.md`, las reglas comunes en `docs/FICH
 | `politicas.html` | Políticas de uso y privacidad (borrador). Es la única fuente del texto: `index.html` lo lee de aquí |
 | `descargas.html` | Descargas con versión, tamaño y SHA-256, leídas de `datos/descargas.v1.json`. Solo enlaces a GitHub Releases |
 | `404.html` | Usa `<base href="/PaginaAsistenteCECAPI/">`; con dominio propio, cambiar a `/` |
-| `assets/js/config.v2.js` | Servidor, rutas y reglas de cuenta. Público: sin llaves |
+| `assets/js/config.v3.js` | Servidor, rutas y reglas de cuenta. Público: sin llaves |
 | `assets/js/api.v4.js` | Cliente del servidor con tiempo de espera y errores en español |
 | `assets/js/asistente.v4.js` | Lógica de la página: políticas, cuenta, chat |
 | `assets/css/`, `assets/fuentes/`, `preferencias.v4.js`, `lectura.v2.js` | Igual que en PaginaCECAPI (estilos del asistente en `asistente.v5.css`) |
@@ -24,11 +24,11 @@ La ficha del proyecto está en `docs/FICHA.md`, las reglas comunes en `docs/FICH
 - **Borrado:** con la sesión abierta hay "Borrar mis chats guardados" y "Eliminar mi cuenta" (pide la contraseña). Los dos piden confirmación. Cerrar sesión borra además la conversación del navegador.
 - **Chat:** manda `{ pregunta, contexto }` a `POST /preguntar` con las últimas 6 líneas. La respuesta se anuncia al lector de pantalla con una región `aria-live` educada y, si la persona lo pide, se lee con la voz del navegador. Enter envía; Mayúsculas + Enter hace salto de línea.
 - **Servidor dormido:** al abrir la página se llama a `GET /`. Si una respuesta tarda más de 4 segundos, se avisa y suena un tono de espera cada 3 segundos (se puede apagar).
-- **Sin cuentas todavía:** mientras `config.rutas.acceso` y `config.rutas.registro` sean `null`, la página lo avisa y, si `permitirSinCuenta` es `true`, deja usar el chat. En cuanto existan las rutas, el chat exige iniciar sesión.
+- **Cuentas:** las rutas ya apuntan a `/cuenta/...` del servidor (decisión 0020 de EstadiasAppMobil, `backend/cuentas.py`), así que el chat pide iniciar sesión. Si se vuelven a poner en `null`: mientras `config.rutas.acceso` y `config.rutas.registro` sean `null`, la página lo avisa y, si `permitirSinCuenta` es `true`, deja usar el chat. En cuanto existan las rutas, el chat exige iniciar sesión.
 
-## Contrato con el servidor (propuesta)
+## Contrato con el servidor
 
-Lo que la página espera. Si el servidor usa otras rutas o nombres, se cambian en `config.v2.js` y `api.v4.js`. Los errores deben traer `{ "detail": "texto en español" }`, porque ese texto se muestra y se lee en voz alta.
+Lo que la página espera. Si el servidor usa otras rutas o nombres, se cambian en `config.v3.js` y `api.v4.js`. Los errores deben traer `{ "detail": "texto en español" }`, porque ese texto se muestra y se lee en voz alta.
 
 | Ruta | Cuerpo | Respuesta | Notas |
 |---|---|---|---|

@@ -6,18 +6,18 @@ window.CECAPI_CONFIG = {
   apiBase: "",
 
   // Rutas del servidor. null = el servidor todavía no la tiene; la página lo avisa y no falla.
-  // Las de cuenta son una PROPUESTA para el equipo del servidor; ver README ("Contrato con el servidor").
+  // Las de cuenta son las de backend/cuentas.py (decisión 0020 de EstadiasAppMobil).
   rutas: {
-    salud: "/",                 // GET, sin clave; no toca la base de datos
-    preguntar: "/preguntar",    // POST { pregunta, contexto } -> { respuesta, proveedor, hayMas }
-    registro: null,             // POST { usuario, correo, contrasena, mayorDeEdad } -> { requiereCodigo }
-    verificar: null,            // POST { correo, codigo } -> { token, usuario }
-    acceso: null,               // POST { identificador, contrasena } -> { token, usuario }
-    recuperar: null,            // POST { correo } -> 200 siempre, exista o no el correo
-    restablecer: null,          // POST { correo, codigo, contrasena } -> 200
-    aceptacion: null,           // POST { version, fecha, mayorDeEdad } con Authorization: Bearer
-    borrarChats: null,          // DELETE con Authorization: Bearer
-    eliminarCuenta: null        // DELETE { contrasena } con Authorization: Bearer
+    salud: "/",                              // GET, sin clave; no toca la base de datos
+    preguntar: "/preguntar",                 // POST { pregunta, contexto } -> { respuesta, proveedor, hayMas }
+    registro: "/cuenta/registro",            // POST { usuario, correo, contrasena, mayorDeEdad } -> { requiereCodigo }
+    verificar: "/cuenta/verificar",          // POST { correo, codigo } -> { token, usuario }
+    acceso: "/cuenta/acceso",                // POST { identificador, contrasena } -> { token, usuario }
+    recuperar: "/cuenta/recuperar",          // POST { correo } -> 200 siempre, exista o no el correo
+    restablecer: "/cuenta/restablecer",      // POST { correo, codigo, contrasena } -> 200
+    aceptacion: "/cuenta/aceptacion",        // POST { version, fecha, mayorDeEdad } con Authorization: Bearer
+    borrarChats: "/cuenta/borrarChats",      // DELETE con Authorization: Bearer
+    eliminarCuenta: "/cuenta/eliminarCuenta" // DELETE { contrasena } con Authorization: Bearer
   },
 
   // El servidor manda un código al correo al registrarse y al recuperar la contraseña.

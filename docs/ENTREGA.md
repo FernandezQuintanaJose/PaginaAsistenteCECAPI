@@ -17,7 +17,7 @@ Revisión completa, hallazgos de todo el ecosistema y orden sugerido para la sem
 
 ## Para entregar
 1. ~~Fusionar `qa/correcciones` a `main`~~ (hecho el 4 nov 2026).
-2. Cuando el servidor esté publicado: `apiBase` en `assets/js/config.v2.js` y, si no es `*.onrender.com`, `connect-src` de la CSP de `index.html`.
+2. Cuando el servidor esté publicado: `apiBase` en `assets/js/config.v3.js` y, si no es `*.onrender.com`, `connect-src` de la CSP de `index.html`.
 3. Llenar `config.rutas` con las rutas de cuenta y decidir `permitirSinCuenta`.
 4. `politicas.html`: datos entre corchetes, correo ARCO que confirme CECAPI y revisión legal.
 5. `datos/descargas.v1.json`: cuando existan los Releases de Android y Windows (versión, archivo, url, tamaño y SHA-256).
