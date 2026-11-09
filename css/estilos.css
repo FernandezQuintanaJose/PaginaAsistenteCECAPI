@@ -119,14 +119,14 @@ button[aria-current="page"], button[aria-pressed="true"] { color: var(--texto); 
 
 /* ---------- Contenedor principal ---------- */
 main {
-  flex: 1; display: flex; align-items: center; justify-content: center; gap: 1.5rem;
+  flex: 1; display: flex; flex-direction: column; gap: 1.5rem;
   width: min(1300px, 100% - 2rem); margin-inline: auto;
   padding-block: 1rem 2rem;
 }
 .vista { display: flex; flex-direction: column; padding-block: 1rem; }
 
 /* ---------- Chat ---------- */
-#vista-chat { flex: 1; min-width: 0; height: min(88vh, 820px); }
+#vista-chat { min-width: 0; height: min(80vh, 780px); }
 
 /* Encabezado grande */
 .bienvenida { text-align: center; margin-bottom: 1.75rem; }
@@ -220,6 +220,9 @@ body.contraste .msg.error p { border: 2px solid #ff0; background: #000; }
 }
 .entrada textarea::placeholder { color: #c3ccd2; }
 .entrada textarea:focus { border-color: var(--primario); }
+body.contraste .entrada textarea { border: 2px solid #fff; }
+body.contraste .entrada textarea::placeholder { color: #fff; }
+body.contraste .entrada textarea:focus { border-color: #ff0; outline: 2px solid #ff0; outline-offset: 2px; }
 
 /* Botones principales */
 .entrada button, .primario, .boton {
@@ -255,27 +258,29 @@ body.contraste .entrada button, body.contraste .primario, body.contraste .boton 
 body.contraste .entrada .microfono { background: #000; color: #ff0; border-color: #ff0; }
 body.contraste .entrada .microfono[aria-pressed="true"] { background: #ff0; color: #000; }
 
-/* ---------- Descargas (columna a la derecha del chat) ---------- */
+/* ---------- Descargas (debajo del chat, centradas) ---------- */
 .descargas {
   flex: none;
-  display: flex; flex-direction: column; align-items: center; gap: 1rem;
+  display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 1.5rem;
+  margin-top: 2.5rem; /* separación con el chat */
 }
 .descargas h2 {
+  width: 100%; text-align: center;
   font-size: .85rem; font-weight: 600;
   letter-spacing: .1em; text-transform: uppercase;
   color: var(--suave);
 }
 
-/* Botón cuadrado con bordes redondeados */
+/* Botón rectangular con bordes redondeados: icono a la izquierda, textos a la derecha */
 .cuadrado {
-  width: 150px; aspect-ratio: 1;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .35rem;
+  width: 300px; min-height: 110px; padding: 1rem 1.5rem;
+  display: grid; grid-template-columns: auto 1fr; align-content: center; column-gap: 1.1rem;
   border: 1px solid var(--borde);
   border-radius: 22px;
   background: linear-gradient(180deg, rgba(36, 56, 66, .75), rgba(29, 41, 48, .9));
   color: var(--texto);
   text-decoration: none;
-  text-align: center;
+  text-align: left;
   transition: transform .2s, border-color .2s, box-shadow .2s;
 }
 .cuadrado:hover, .cuadrado:focus-visible {
@@ -284,22 +289,23 @@ body.contraste .entrada .microfono[aria-pressed="true"] { background: #ff0; colo
   box-shadow: 0 10px 30px rgba(79, 209, 197, .2);
 }
 .cuadrado svg {
-  width: 40px; height: 40px; padding: 8px;
+  grid-row: span 2; align-self: center;
+  width: 60px; height: 60px; padding: 12px;
   border-radius: 12px;
   background: linear-gradient(135deg, var(--primario), var(--primario-2));
   fill: none; stroke: var(--sobre-primario); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;
 }
-.plataforma { font-family: "Space Grotesk", sans-serif; font-size: 1.15rem; font-weight: 700; }
-.tipo { font-size: .8rem; color: var(--suave); }
+.plataforma { font-family: "Space Grotesk", sans-serif; font-size: 1.6rem; font-weight: 700; }
+.tipo { font-size: 1rem; color: var(--suave); }
 body.contraste .cuadrado { background: #000; border-color: #fff; }
 body.contraste .cuadrado svg { background: #ff0; }
 
-/* Datos que aparecen al pasar el cursor (se abren hacia la izquierda) */
+/* Datos que aparecen al pasar el cursor (se abren hacia arriba) */
 .con-info { position: relative; display: inline-block; }
 .info {
   display: none;
-  position: absolute; top: 50%; right: calc(100% + .75rem); z-index: 20;
-  transform: translateY(-50%);
+  position: absolute; bottom: calc(100% + .75rem); left: 50%; z-index: 20;
+  transform: translateX(-50%);
   width: max-content;
   grid-template-columns: auto 1fr; gap: .15rem .75rem;
   padding: .75rem 1rem;
@@ -309,7 +315,7 @@ body.contraste .cuadrado svg { background: #ff0; }
   border-radius: 12px;
   box-shadow: 0 12px 30px rgba(0, 0, 0, .5);
 }
-.info::before { content: ""; position: absolute; top: 0; bottom: 0; right: -.75rem; width: .75rem; }
+.info::before { content: ""; position: absolute; left: 0; right: 0; bottom: -.75rem; height: .75rem; }
 .info dt { color: var(--suave); }
 .info code { color: var(--primario); }
 .con-info:hover .info,
@@ -333,10 +339,7 @@ dialog button { border-color: rgba(255, 255, 255, .15); background: rgba(255, 25
 
 /* ---------- Celular ---------- */
 @media (max-width: 900px) {
-  main { flex-direction: column; align-items: stretch; }
-  .descargas { flex-direction: row; flex-wrap: wrap; justify-content: center; }
-  .descargas h2 { width: 100%; text-align: center; }
-  .info { top: calc(100% + .5rem); right: auto; left: 0; transform: none; }
+  .cuadrado { width: min(300px, 100vw - 2rem); }
 }
 
 @media (max-width: 700px) {
