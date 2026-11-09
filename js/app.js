@@ -68,7 +68,7 @@ async function llamarApi(ruta, { datos, tiempo = TIEMPO_NORMAL } = {}) {
 /* ---------- Inicio de sesión con Google ---------- */
 // Pega aquí el "ID de cliente" que te da Google Cloud Console (ver instrucciones).
 // Este ID es público por diseño; no es una llave secreta.
-const GOOGLE_CLIENT_ID = '815992457051-jcnemqoj7idscjl2n4s5pqq91q8tunnv.apps.googleusercontent.com';
+const GOOGLE_CLIENT_ID = '704910080031-3p6ppcoqd9k129l6i4g1jo78uak0jovu.apps.googleusercontent.com';
 
 // Datos de la persona que inició sesión. Solo en memoria: al recargar se pierden
 // y se recuperan desde la cookie del servidor (o con el inicio automático de Google).
