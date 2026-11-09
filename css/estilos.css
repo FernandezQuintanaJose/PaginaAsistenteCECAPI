@@ -126,10 +126,41 @@ main {
 .vista { display: flex; flex-direction: column; padding-block: 1rem; }
 
 /* ---------- Chat ---------- */
-#vista-chat { min-width: 0; height: min(80vh, 780px); }
+/* El chat ocupa justo la pantalla visible (menos la barra de arriba),
+   así al abrir la página la caja de texto y los botones se ven completos.
+   --alto-barra lo mide app.js; 80px es el valor por si no carga. */
+#vista-chat {
+  min-width: 0;
+  height: max(420px, calc(100vh - var(--alto-barra, 80px) - 3rem));
+  height: max(420px, calc(100dvh - var(--alto-barra, 80px) - 3rem));
+}
 
-/* Encabezado grande */
-.bienvenida { text-align: center; margin-bottom: 1.75rem; }
+/* Recuadro del chat: contiene el título, la conversación y la caja de texto */
+.caja-chat {
+  flex: 1; min-height: 0;
+  display: flex; flex-direction: column;
+  background: linear-gradient(180deg, rgba(36, 56, 66, .75), rgba(29, 41, 48, .9));
+  border: 1px solid var(--borde);
+  border-radius: 18px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 -10px 40px rgba(79, 209, 197, .06);
+}
+body.contraste .caja-chat { background: #000; border-color: #fff; }
+
+/* Encabezado grande, centrado en el recuadro mientras no hay mensajes.
+   Al empezar a escribir se encoge con una transición y la conversación ocupa su lugar. */
+.bienvenida {
+  flex: 1 1 0; min-height: 0; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  padding-inline: 1rem;
+  text-align: center;
+  transition: flex-grow .4s ease, opacity .3s ease;
+}
+.bienvenida.oculta { flex-grow: 0; opacity: 0; }
+/* Mientras se ve el título, la conversación (vacía) no reclama espacio */
+.bienvenida:not(.oculta) + .conversacion { flex-grow: 0; }
+.conversacion:empty { padding-block: 0; } /* así el título queda bien centrado */
+@media (prefers-reduced-motion: reduce) { .bienvenida, .conversacion { transition: none; } }
 .bienvenida h1 {
   font-size: clamp(2.2rem, 6vw, 3.8rem);
   font-weight: 700;
@@ -151,23 +182,12 @@ body.contraste .acento { background: none; color: #ff0; }
   background: rgba(79, 209, 197, .08); color: var(--texto);
 }
 
-/* Marco: la conversación es la parte de arriba y la caja de texto la de abajo */
-.conversacion,
-.entrada {
-  background: linear-gradient(180deg, rgba(36, 56, 66, .75), rgba(29, 41, 48, .9));
-  border: 1px solid var(--borde);
-  backdrop-filter: blur(8px);
-}
-body.contraste .conversacion, body.contraste .entrada { background: #000; }
-
 .conversacion {
   list-style: none;
   flex: 1; min-height: 0; overflow-y: auto;
+  transition: flex-grow .4s ease;
   display: flex; flex-direction: column; gap: 1rem;
   padding: 1.5rem 1.5rem 1rem;
-  border-bottom: none;
-  border-radius: 18px 18px 0 0;
-  box-shadow: 0 -10px 40px rgba(79, 209, 197, .06);
 }
 
 /* Mensajes con avatar */
@@ -208,8 +228,6 @@ body.contraste .msg.error p { border: 2px solid #ff0; background: #000; }
   display: flex; align-items: center; gap: .5rem;
   margin-top: 0;
   padding: .5rem 1.5rem 1.5rem;
-  border-top: none;
-  border-radius: 0 0 18px 18px;
 }
 .entrada textarea {
   flex: 1; resize: none;

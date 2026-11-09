@@ -162,6 +162,7 @@ const botonEnviar = $('form-chat').querySelector('button[type="submit"]');
 function agregarMensaje(texto, quien, esError = false) {
   const li = document.createElement('li');
   li.className = 'msg ' + quien + (esError ? ' error' : '');
+  ocultarTitulo(); // con el primer mensaje el título deja su espacio a la conversación
   li.innerHTML = `<span class="autor">${quien === 'ia' ? 'CECAPI' : 'Tú'}</span>`;
   const p = document.createElement('p');
   p.textContent = texto; // textContent evita inyectar HTML
@@ -193,6 +194,18 @@ async function pedirRespuesta(texto) {
     $('aviso-servidor').hidden = true;
   }
 }
+
+// Mide la barra de arriba para que el chat quepa completo en la pantalla (ver #vista-chat en el CSS).
+// Se vuelve a medir si cambia de alto: al iniciar sesión, al agrandar el texto o en el celular.
+const barra = document.querySelector('.barra');
+new ResizeObserver(() => {
+  document.documentElement.style.setProperty('--alto-barra', barra.offsetHeight + 'px');
+}).observe(barra);
+
+// Al empezar a escribir, el título se pliega y la conversación ocupa su espacio.
+// Sigue en la página para los lectores de pantalla; solo deja de verse.
+function ocultarTitulo() { $('bienvenida').classList.add('oculta'); }
+$('mensaje').addEventListener('input', ocultarTitulo);
 
 $('form-chat').addEventListener('submit', async (e) => {
   e.preventDefault();

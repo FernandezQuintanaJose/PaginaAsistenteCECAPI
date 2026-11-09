@@ -32,21 +32,21 @@
   <main>
     <!-- Vista: Chat -->
     <section id="vista-chat" class="vista" aria-labelledby="titulo-chat">
-      <div class="bienvenida">
-        <h1 id="titulo-chat">Asistente <span class="acento">CECAPI</span></h1>
-        <p>¿En qué te puedo ayudar hoy?</p>
-      </div>
-
       <p id="aviso-servidor" class="aviso" hidden>
         El servidor se está despertando. Esto puede tardar hasta un minuto; tu mensaje se enviará en cuanto esté listo.
       </p>
 
-      <ol id="conversacion" class="conversacion" aria-label="Conversación">
-        <li class="msg ia">
-          <span class="autor">CECAPI</span>
-          <p>Hola, soy el asistente de CECAPI. ¿En qué te puedo ayudar?</p>
-        </li>
-      </ol>
+      <!-- Recuadro del chat: título, conversación y caja de texto -->
+      <div class="caja-chat">
+      <!-- El título se oculta al empezar a escribir y su espacio pasa a la conversación -->
+      <div id="bienvenida" class="bienvenida">
+        <div class="bienvenida-contenido">
+          <h1 id="titulo-chat">Asistente <span class="acento">CECAPI</span></h1>
+          <p>¿En qué te puedo ayudar hoy?</p>
+        </div>
+      </div>
+
+      <ol id="conversacion" class="conversacion" aria-label="Conversación"></ol>
 
       <!-- Región que lee el lector de pantalla cuando llega una respuesta -->
       <div id="anuncio" class="oculto" aria-live="polite"></div>
@@ -59,6 +59,7 @@
         </button>
         <button type="submit">Enviar</button>
       </form>
+      </div>
     </section>
 
     <!-- Vista: Descargas -->
