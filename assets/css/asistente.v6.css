@@ -127,3 +127,31 @@ input[aria-invalid="true"] { border-color: var(--error); border-width: 3px; }
 }
 .confirmar h3 { margin-top: 0; }
 .confirmar[hidden], .form-cuenta[hidden] { display: none; }
+
+/* Chat en un solo recuadro: título grande y centrado mientras no hay mensajes, y la caja de
+   texto al pie del mismo recuadro. Diseño tomado de la propuesta de la página de Juan Miranda,
+   con los colores y la tipografía de este sitio, sin inicio de sesión con Google. */
+.caja-chat {
+  margin-top: 2rem;
+  padding: 1.25rem;
+  border: 1px solid var(--linea);
+  border-radius: 1rem;
+  background: var(--papel);
+}
+.bienvenida {
+  padding: 2.5rem 1rem;
+  text-align: center;
+}
+.bienvenida p { max-width: none; margin: 0.5rem 0 0; }
+.bienvenida .bienvenida-titulo {
+  margin: 0;
+  font-size: clamp(1.6rem, 4vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.25;
+}
+.caja-chat .mensajes { margin-top: 0; }
+.caja-chat .formulario {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--linea);
+}

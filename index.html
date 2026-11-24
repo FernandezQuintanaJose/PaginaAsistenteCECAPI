@@ -9,7 +9,7 @@
   <meta name="description" content="Conversa por escrito con el asistente de CECAPI para personas ciegas y con baja visión.">
   <link rel="preload" href="assets/fuentes/atkinson-hyperlegible-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/css/sitio.v6.css">
-  <link rel="stylesheet" href="assets/css/asistente.v5.css">
+  <link rel="stylesheet" href="assets/css/asistente.v6.css">
   <script src="assets/js/preferencias.v4.js"></script>
   <script src="assets/js/lectura.v2.js" defer></script>
   <script src="assets/js/config.v3.js" defer></script>
@@ -216,9 +216,12 @@
       </section>
 
       <!-- Chat -->
-      <section id="chat" aria-labelledby="titulo-chat" hidden>
-        <h2 id="titulo-chat">Conversación</h2>
-        <p id="chat-vacio">Todavía no hay mensajes. Escribe tu primera pregunta abajo.</p>
+      <section id="chat" class="caja-chat" aria-labelledby="titulo-chat" hidden>
+        <h2 id="titulo-chat" class="solo-lector">Conversación</h2>
+        <div id="chat-vacio" class="bienvenida">
+          <p class="bienvenida-titulo">¿En qué te puedo ayudar hoy?</p>
+          <p>Todavía no hay mensajes. Escribe tu primera pregunta abajo.</p>
+        </div>
         <ol id="mensajes" class="mensajes"></ol>
 
         <form id="formulario" class="formulario" novalidate>
