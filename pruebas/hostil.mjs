@@ -13,13 +13,15 @@ const srv = await servir(PUERTO);
 const nav = await chromium.launch();
 const leerRepo = (ruta) => readFile(new URL("../" + ruta, import.meta.url), "utf8");
 const version = (await leerRepo("politicas.html")).match(/data-version="([^"]+)"/)[1];
-const cfgBase = (await leerRepo("assets/js/config.v2.js")).replace('apiBase: ""', `apiBase: "${API}"`).replace("avisoDespertarMs: 4000", "avisoDespertarMs: 300");
+const cfgBase = (await leerRepo("assets/js/config.v3.js")).replace('apiBase: ""', `apiBase: "${API}"`).replace("avisoDespertarMs: 4000", "avisoDespertarMs: 300")
+  // Sin rutas de cuenta: aquí se ataca el chat; las cuentas tienen su propia prueba (cuenta.mjs).
+  .replace(/(registro|verificar|acceso|recuperar|restablecer|aceptacion|borrarChats|eliminarCuenta): "\/cuenta\/\w+"/g, "$1: null");
 let hallazgos = [];
 const reporta = (ok, d) => { console.log(`${ok ? "ok   " : "ROTO "} ${d}`); if (!ok) hallazgos.push(d); };
 
 async function sesion({ resp, init, cfg } = {}) {
   const ctx = await nav.newContext();
-  await ctx.route("**/assets/js/config.v2.js", (r) => r.fulfill({ contentType: "text/javascript", body: cfg || cfgBase }));
+  await ctx.route("**/assets/js/config.v3.js", (r) => r.fulfill({ contentType: "text/javascript", body: cfg || cfgBase }));
   const recibidas = [];
   await ctx.route(`${API}/**`, async (r) => {
     const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "*", "Access-Control-Allow-Methods": "GET,POST,DELETE" };
