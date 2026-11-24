@@ -127,5 +127,40 @@ for (const [n, v] of malos) {
   await preguntar(p, "hola"); await ctx.setOffline(true); await libre(p, 5000); await ctx.setOffline(false);
   reporta(await libre(p, 2000), "se cae el internet a mitad: el chat se libera"); await ctx.close();
 }
+// --- Rol: texto raro, servidor caido y cierre a mitad de respuesta
+{
+  const { p, recibidas, errs } = await sesion({ resp: { body: { respuesta: "ok" } } });
+  await p.focus("#pregunta");
+  await p.keyboard.insertText("x".repeat(100000));
+  const largo = (await p.inputValue("#pregunta")).length;
+  reporta(largo <= 2000 && errs.length === 0, `texto enorme pegado (100000): el campo se queda en ${largo} caracteres y no hay errores`);
+  await p.press("#pregunta", "Enter"); await libre(p, 3000);
+  reporta(recibidas.length === 1 && JSON.parse(recibidas[0]).pregunta.length <= 2000, "texto enorme: lo que sale nunca pasa de 2000 caracteres");
+  await p.context().close();
+}
+{
+  const emojis = "\u{1F600}\u{1F44D}\u{1F9D1}‍\u{1F9AF}\u{1F1F2}\u{1F1FD}";
+  const { p, errs, recibidas } = await sesion({ resp: { body: { respuesta: emojis + " listo" } } });
+  await preguntar(p, "hola " + emojis); await libre(p, 3000);
+  reporta(recibidas.length === 1 && JSON.parse(recibidas[0]).pregunta.includes(emojis) && errs.length === 0, "emojis y secuencias raras: se envian completos y no hay errores");
+  reporta((await p.locator("#mensajes li").last().textContent()).includes("listo"), "emojis en la respuesta: se muestran");
+  await p.context().close();
+}
+{
+  const { p, ctx, errs } = await sesion({ resp: { body: { respuesta: "ok" } } });
+  await ctx.route(`${API}/preguntar`, (r) => r.abort("connectionrefused"));
+  await preguntar(p, "hola"); const ok = await libre(p, 3000);
+  const txt = (await p.locator("#mensajes li").last().textContent().catch(() => "")).trim();
+  reporta(ok && /conectar|conexi/i.test(txt) && errs.length === 0, `servidor caido (conexion rechazada): se libera y avisa -> "${txt.slice(0, 70)}"`);
+  await ctx.close();
+}
+{
+  const { p, ctx, errs } = await sesion({ resp: { espera: 5000, body: { respuesta: "tarde" } } });
+  await preguntar(p, "hola"); await p.waitForTimeout(300);
+  await p.reload({ waitUntil: "networkidle" });
+  reporta(errs.length === 0 && await p.isVisible("#chat"), `recargar a mitad de respuesta: el chat abre sin errores (errores=${errs.length})`);
+  reporta((await p.locator("#mensajes li").count()) <= 1, "recargar a mitad de respuesta: no queda guardada la conversacion (privacidad)");
+  await ctx.close();
+}
 await nav.close(); srv.close();
 console.log("\nHALLAZGOS:", hallazgos.length); hallazgos.forEach((h) => console.log(" -", h)); process.exit(hallazgos.length ? 1 : 0);
