@@ -16,7 +16,7 @@ $('contraste').addEventListener('click', (e) => {
 });
 
 /* ---------- Conexión con el servidor (API) ---------- */
-// Dirección del servidor de CECAPI, sin "/" al final. Ejemplo: 'https://api.cecapi.org'
+// Dirección del servidor de ALIA, sin "/" al final. Ejemplo: 'https://api.cecapi.org'
 // Mientras esté vacía, la página funciona en MODO PRUEBA: respuestas simuladas.
 //
 // Lo que el servidor debe ofrecer:
@@ -163,7 +163,7 @@ function agregarMensaje(texto, quien, esError = false) {
   const li = document.createElement('li');
   li.className = 'msg ' + quien + (esError ? ' error' : '');
   ocultarTitulo(); // con el primer mensaje el título deja su espacio a la conversación
-  li.innerHTML = `<span class="autor">${quien === 'ia' ? 'CECAPI' : 'Tú'}</span>`;
+  li.innerHTML = `<span class="autor">${quien === 'ia' ? 'ALIA' : 'Tú'}</span>`;
   const p = document.createElement('p');
   p.textContent = texto; // textContent evita inyectar HTML
   li.appendChild(p);
@@ -173,13 +173,13 @@ function agregarMensaje(texto, quien, esError = false) {
 
 function responder(texto, esError = false) {
   agregarMensaje(texto, 'ia', esError);
-  $('anuncio').textContent = (esError ? 'Aviso: ' : 'CECAPI responde: ') + texto; // lo lee el lector de pantalla
+  $('anuncio').textContent = (esError ? 'Aviso: ' : 'ALIA responde: ') + texto; // lo lee el lector de pantalla
 }
 
 async function pedirRespuesta(texto) {
   if (MODO_PRUEBA) {
     await esperar(800);
-    return 'Esta es una respuesta de ejemplo. Aquí aparecerá lo que conteste la IA de CECAPI.';
+    return 'Esta es una respuesta de ejemplo. Aquí aparecerá lo que conteste la IA de ALIA.';
   }
   // Si tarda más de 3 s, probablemente el servidor se está despertando: se avisa.
   const avisoLento = setTimeout(() => {
@@ -329,7 +329,7 @@ if (Reconocimiento && !navegadorSinDictado) {
 
 /* ---------- Políticas con audio ---------- */
 const politicas = [
-  { titulo: 'Política de uso', texto: 'Aquí irá el texto de la política de uso de CECAPI. Este es un texto de ejemplo.' },
+  { titulo: 'Política de uso', texto: 'Aquí irá el texto de la política de uso de ALIA. Este es un texto de ejemplo.' },
   { titulo: 'Política de privacidad', texto: 'Aquí irá el texto de la política de privacidad. Explica qué datos se guardan y para qué.' },
 ];
 let pagina = 0;
@@ -377,8 +377,8 @@ $('aceptar').addEventListener('click', () => {
   $('mensaje').focus();
 });
 $('rechazar').addEventListener('click', () => {
-  leer('Para usar CECAPI necesitas aceptar las políticas.');
-  $('paso-politica').textContent = 'Para usar CECAPI necesitas aceptar las políticas.';
+  leer('Para usar ALIA necesitas aceptar las políticas.');
+  $('paso-politica').textContent = 'Para usar ALIA necesitas aceptar las políticas.';
 });
 // No se puede cerrar con Escape sin aceptar
 dialogo.addEventListener('cancel', (e) => e.preventDefault());
