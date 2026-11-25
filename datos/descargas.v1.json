@@ -1,0 +1,27 @@
+{
+  "actualizado": null,
+  "apps": [
+    {
+      "id": "android",
+      "plataforma": "Android",
+      "nombre": "App CECAPI para Android (APK)",
+      "requisitos": "Android 8.0 o más reciente.",
+      "version": null,
+      "archivo": null,
+      "url": null,
+      "tamanoBytes": null,
+      "sha256": null
+    },
+    {
+      "id": "windows",
+      "plataforma": "Windows",
+      "nombre": "App CECAPI para Windows (.exe)",
+      "requisitos": "Por definir tras la prueba técnica.",
+      "version": null,
+      "archivo": null,
+      "url": null,
+      "tamanoBytes": null,
+      "sha256": null
+    }
+  ]
+}

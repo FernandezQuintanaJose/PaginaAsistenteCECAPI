@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self' https://*.onrender.com; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Asistente de voz de CECAPI</title>
+  <meta name="description" content="Conversa por escrito con el asistente de CECAPI para personas ciegas y con baja visión.">
+  <link rel="preload" href="assets/fuentes/atkinson-hyperlegible-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/sitio.v5.css">
+  <link rel="stylesheet" href="assets/css/asistente.v5.css">
+  <script src="assets/js/preferencias.v4.js"></script>
+  <script src="assets/js/lectura.v2.js" defer></script>
+  <script src="assets/js/config.v2.js" defer></script>
+  <script src="assets/js/api.v4.js" defer></script>
+  <script src="assets/js/asistente.v4.js" defer></script>
+</head>
+<body>
+  <a class="salto" href="#contenido">Saltar al contenido</a>
+
+  <header class="cabecera">
+    <div class="contenedor">
+      <a class="marca" href="./">Asistente CECAPI</a>
+      <button type="button" id="abrir-ajustes" class="boton-ajustes" aria-expanded="false" aria-controls="panel-ajustes" hidden>Ajustes de lectura</button>
+      <nav class="navegacion" aria-label="Principal">
+        <ul>
+          <li><a href="./" aria-current="page">Asistente</a></li>
+          <li><a href="descargas.html">Descargar apps</a></li>
+          <li><a href="politicas.html">Políticas</a></li>
+          <li><a href="https://fernandezquintanajose.github.io/PaginaCECAPI/">Sitio de CECAPI</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div id="panel-ajustes" class="panel-ajustes" hidden>
+    <div class="contenedor">
+      <div class="bloque-ajuste">
+        <p class="rotulo" id="rotulo-texto">Tamaño del texto</p>
+        <div class="grupo" role="group" aria-labelledby="rotulo-texto">
+          <button type="button" id="texto-menos">Más chico</button>
+          <button type="button" id="texto-mas">Más grande</button>
+        </div>
+      </div>
+      <div class="bloque-ajuste">
+        <p class="rotulo" id="rotulo-tema">Tema de color</p>
+        <div class="grupo" role="group" aria-labelledby="rotulo-tema">
+          <button type="button" data-tema-boton="auto" aria-pressed="true">Automático</button>
+          <button type="button" data-tema-boton="claro" aria-pressed="false">Claro</button>
+          <button type="button" data-tema-boton="oscuro" aria-pressed="false">Oscuro</button>
+        </div>
+      </div>
+      <div class="bloque-ajuste">
+        <p class="rotulo" id="rotulo-contraste">Contraste</p>
+        <div class="grupo" role="group" aria-labelledby="rotulo-contraste">
+          <button type="button" id="contraste" aria-pressed="false">Contraste alto</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p id="aviso-ajustes" class="solo-lector" role="status"></p>
+
+  <main id="contenido" tabindex="-1">
+    <div class="contenedor">
+      <h1>Asistente de CECAPI</h1>
+      <p>Escribe una pregunta y el asistente te responde en español, con frases cortas. Funciona con inteligencia artificial, así que puede equivocarse.</p>
+
+      <noscript>
+        <p class="pendiente">El asistente necesita JavaScript activado en el navegador.</p>
+      </noscript>
+
+      <p id="estado-servidor" class="estado" role="status" hidden></p>
+      <p id="anuncio" class="solo-lector" aria-live="polite"></p>
+
+      <!-- Políticas: se leen por partes antes de usar el asistente. -->
+      <section id="politicas" class="panel" aria-labelledby="titulo-politicas" hidden>
+        <h2 id="titulo-politicas">Antes de empezar: políticas de uso y privacidad</h2>
+        <p>Léelas por partes con los botones. Para usar el asistente hay que llegar al final, declarar que eres mayor de edad y aceptarlas. Pasar las partes sin leerlas no cuenta como aceptar.</p>
+        <p><a href="politicas.html">Leer todo el texto en una sola página</a></p>
+
+        <div class="lector-politica">
+          <p id="politica-progreso" class="progreso" aria-hidden="true"></p>
+          <div id="politica-parte" class="parte"></div>
+        </div>
+
+        <div class="botonera">
+          <button type="button" id="politica-escuchar" aria-pressed="false">Escuchar en voz alta</button>
+          <button type="button" id="politica-repetir">Repetir</button>
+          <button type="button" id="politica-siguiente">Siguiente</button>
+        </div>
+
+        <div id="politica-decision" class="decision" role="group" aria-labelledby="titulo-decision">
+          <h3 id="titulo-decision">Tu decisión</h3>
+          <p class="casilla">
+            <input type="checkbox" id="politica-edad">
+            <label for="politica-edad">Declaro que tengo 18 años o más.</label>
+          </p>
+          <p id="politica-requisito" class="ayuda"></p>
+          <div class="botonera">
+            <button type="button" id="politica-aceptar" class="boton-principal" aria-describedby="politica-requisito">Aceptar</button>
+            <button type="button" id="politica-rechazar" class="boton-texto">Rechazar</button>
+            <button type="button" id="politica-despues" class="boton-texto">Después</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="sin-aceptar" class="panel" aria-labelledby="titulo-sin-aceptar" hidden tabindex="-1">
+        <h2 id="titulo-sin-aceptar">El asistente está en pausa</h2>
+        <p id="sin-aceptar-motivo"></p>
+        <button type="button" id="volver-politicas">Leer las políticas</button>
+      </section>
+
+      <!-- Cuenta propia: usuario o correo y contraseña. Sin acceso con Google. -->
+      <section id="cuenta" class="panel" aria-labelledby="titulo-cuenta" hidden>
+        <h2 id="titulo-cuenta" tabindex="-1">Tu cuenta</h2>
+        <p id="cuenta-estado" role="status"></p>
+
+        <div id="cuenta-modos" class="botonera" role="group" aria-label="Qué quieres hacer" hidden>
+          <button type="button" data-modo="f-acceso" aria-pressed="false">Iniciar sesión</button>
+          <button type="button" data-modo="f-registro" aria-pressed="false">Crear cuenta</button>
+          <button type="button" id="ir-recuperar" class="boton-texto" data-modo="f-recuperar" aria-pressed="false">Olvidé mi contraseña</button>
+        </div>
+
+        <form id="f-acceso" class="form-cuenta" novalidate hidden>
+          <h3 tabindex="-1">Iniciar sesión</h3>
+          <p><label for="acc-id">Correo o nombre de usuario</label>
+            <input id="acc-id" name="identificador" type="text" autocomplete="username" autocapitalize="none" spellcheck="false"></p>
+          <p><label for="acc-pass">Contraseña</label>
+            <input id="acc-pass" name="contrasena" type="password" autocomplete="current-password" data-clave></p>
+          <p class="casilla"><input type="checkbox" id="acc-mostrar" data-mostrar><label for="acc-mostrar">Mostrar contraseña</label></p>
+          <p class="error" role="alert" tabindex="-1" hidden></p>
+          <div class="botonera"><button type="submit" class="boton-principal">Iniciar sesión</button></div>
+        </form>
+
+        <form id="f-registro" class="form-cuenta" novalidate hidden>
+          <h3 tabindex="-1">Crear cuenta</h3>
+          <p><label for="reg-usuario">Nombre de usuario</label>
+            <span id="reg-usuario-ayuda" class="ayuda">De 3 a 30 caracteres: letras sin acento, números, punto o guion bajo.</span>
+            <input id="reg-usuario" name="usuario" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" aria-describedby="reg-usuario-ayuda"></p>
+          <p><label for="reg-correo">Correo electrónico</label>
+            <span id="reg-correo-ayuda" class="ayuda">Un código de confirmación llegará a este correo.</span>
+            <input id="reg-correo" name="correo" type="email" autocomplete="email" aria-describedby="reg-correo-ayuda"></p>
+          <p><label for="reg-pass">Contraseña</label>
+            <span id="reg-pass-ayuda" class="ayuda">Al menos 15 caracteres. Puede ser una frase fácil de recordar.</span>
+            <input id="reg-pass" name="contrasena" type="password" autocomplete="new-password" data-clave aria-describedby="reg-pass-ayuda"></p>
+          <p><label for="reg-pass2">Repite la contraseña</label>
+            <input id="reg-pass2" name="repetir" type="password" autocomplete="new-password" data-clave></p>
+          <p class="casilla"><input type="checkbox" id="reg-mostrar" data-mostrar><label for="reg-mostrar">Mostrar contraseñas</label></p>
+          <p class="casilla"><input type="checkbox" id="reg-mayor" name="mayor"><label for="reg-mayor">Declaro que tengo 18 años o más.</label></p>
+          <p class="error" role="alert" tabindex="-1" hidden></p>
+          <div class="botonera"><button type="submit" class="boton-principal">Crear cuenta</button></div>
+        </form>
+
+        <form id="f-codigo" class="form-cuenta" novalidate hidden>
+          <h3 tabindex="-1">Confirma tu correo</h3>
+          <p id="codigo-aviso"></p>
+          <p><label for="cod-codigo">Código</label>
+            <input id="cod-codigo" name="codigo" type="text" inputmode="numeric" autocomplete="one-time-code" spellcheck="false"></p>
+          <p class="error" role="alert" tabindex="-1" hidden></p>
+          <div class="botonera">
+            <button type="submit" class="boton-principal">Confirmar</button>
+            <button type="button" class="boton-texto" data-ir="f-registro">Volver</button>
+          </div>
+        </form>
+
+        <form id="f-recuperar" class="form-cuenta" novalidate hidden>
+          <h3 tabindex="-1">Recuperar tu contraseña</h3>
+          <p>Escribe el correo de tu cuenta. Te enviaremos un código para elegir una contraseña nueva.</p>
+          <p><label for="rec-correo">Correo electrónico</label>
+            <input id="rec-correo" name="correo" type="email" autocomplete="email"></p>
+          <p class="error" role="alert" tabindex="-1" hidden></p>
+          <div class="botonera">
+            <button type="submit" class="boton-principal">Enviar código</button>
+            <button type="button" class="boton-texto" data-ir="f-acceso">Volver</button>
+          </div>
+        </form>
+
+        <form id="f-restablecer" class="form-cuenta" novalidate hidden>
+          <h3 tabindex="-1">Elige una contraseña nueva</h3>
+          <p id="restablecer-aviso"></p>
+          <p><label for="res-codigo">Código</label>
+            <input id="res-codigo" name="codigo" type="text" inputmode="numeric" autocomplete="one-time-code" spellcheck="false"></p>
+          <p><label for="res-pass">Contraseña nueva</label>
+            <span id="res-pass-ayuda" class="ayuda">Al menos 15 caracteres.</span>
+            <input id="res-pass" name="contrasena" type="password" autocomplete="new-password" data-clave aria-describedby="res-pass-ayuda"></p>
+          <p><label for="res-pass2">Repite la contraseña nueva</label>
+            <input id="res-pass2" name="repetir" type="password" autocomplete="new-password" data-clave></p>
+          <p class="casilla"><input type="checkbox" id="res-mostrar" data-mostrar><label for="res-mostrar">Mostrar contraseñas</label></p>
+          <p class="error" role="alert" tabindex="-1" hidden></p>
+          <div class="botonera">
+            <button type="submit" class="boton-principal">Cambiar contraseña</button>
+            <button type="button" class="boton-texto" data-ir="f-acceso">Cancelar</button>
+          </div>
+        </form>
+
+        <div id="cuenta-sesion" hidden>
+          <div class="botonera">
+            <button type="button" id="cerrar-sesion">Cerrar sesión</button>
+            <button type="button" id="borrar-chats">Borrar mis chats guardados</button>
+            <button type="button" id="eliminar-cuenta" class="boton-texto">Eliminar mi cuenta</button>
+          </div>
+        </div>
+
+        <div id="confirmar" class="confirmar" role="group" aria-labelledby="confirmar-titulo" hidden>
+          <h3 id="confirmar-titulo" tabindex="-1"></h3>
+          <p id="confirmar-texto"></p>
+          <p id="confirmar-clave" hidden><label for="confirmar-pass">Contraseña</label>
+            <input id="confirmar-pass" type="password" autocomplete="current-password"></p>
+          <p id="confirmar-error" class="error" role="alert" tabindex="-1" hidden></p>
+          <div class="botonera">
+            <button type="button" id="confirmar-si" class="boton-principal"></button>
+            <button type="button" id="confirmar-no">Cancelar</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Chat -->
+      <section id="chat" aria-labelledby="titulo-chat" hidden>
+        <h2 id="titulo-chat">Conversación</h2>
+        <p id="chat-vacio">Todavía no hay mensajes. Escribe tu primera pregunta abajo.</p>
+        <ol id="mensajes" class="mensajes"></ol>
+
+        <form id="formulario" class="formulario" novalidate>
+          <label for="pregunta">Tu pregunta</label>
+          <p id="pregunta-ayuda" class="ayuda">No escribas datos personales como tu correo, teléfono, CURP, domicilio o datos de salud.</p>
+          <textarea id="pregunta" name="pregunta" rows="3" maxlength="2000" aria-describedby="pregunta-ayuda pregunta-error"></textarea>
+          <p id="pregunta-error" class="error" hidden></p>
+          <div class="botonera">
+            <button type="submit" id="enviar" class="boton-principal">Enviar pregunta</button>
+            <button type="button" id="voz-respuestas" aria-pressed="false">Leer respuestas en voz alta</button>
+            <button type="button" id="tono-espera" aria-pressed="true">Tono de espera</button>
+            <button type="button" id="borrar">Borrar conversación</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <footer class="pie">
+    <div class="contenedor">
+      <ul>
+        <li><a href="politicas.html">Políticas de uso y privacidad</a></li>
+        <li><a href="descargas.html">Descargar apps</a></li>
+      </ul>
+      <p>Centro de Capacitación para Invidentes A. C., Durango.</p>
+    </div>
+  </footer>
+</body>
+</html>

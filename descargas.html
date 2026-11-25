@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Descargar apps, Asistente CECAPI</title>
+  <meta name="description" content="Descarga la app de CECAPI para Android y Windows, con su versión, tamaño y suma de verificación.">
+  <link rel="preload" href="assets/fuentes/atkinson-hyperlegible-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/sitio.v5.css">
+  <link rel="stylesheet" href="assets/css/asistente.v5.css">
+  <script src="assets/js/preferencias.v4.js"></script>
+  <script src="assets/js/lectura.v2.js" defer></script>
+  <script src="assets/js/descargas.v3.js" defer></script>
+</head>
+<body>
+  <a class="salto" href="#contenido">Saltar al contenido</a>
+
+  <header class="cabecera">
+    <div class="contenedor">
+      <a class="marca" href="./">Asistente CECAPI</a>
+      <button type="button" id="abrir-ajustes" class="boton-ajustes" aria-expanded="false" aria-controls="panel-ajustes" hidden>Ajustes de lectura</button>
+      <nav class="navegacion" aria-label="Principal">
+        <ul>
+          <li><a href="./">Asistente</a></li>
+          <li><a href="descargas.html" aria-current="page">Descargar apps</a></li>
+          <li><a href="politicas.html">Políticas</a></li>
+          <li><a href="https://fernandezquintanajose.github.io/PaginaCECAPI/">Sitio de CECAPI</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div id="panel-ajustes" class="panel-ajustes" hidden>
+    <div class="contenedor">
+      <div class="bloque-ajuste">
+        <p class="rotulo" id="rotulo-texto">Tamaño del texto</p>
+        <div class="grupo" role="group" aria-labelledby="rotulo-texto">
+          <button type="button" id="texto-menos">Más chico</button>
+          <button type="button" id="texto-mas">Más grande</button>
+        </div>
+      </div>
+      <div class="bloque-ajuste">
+        <p class="rotulo" id="rotulo-tema">Tema de color</p>
+        <div class="grupo" role="group" aria-labelledby="rotulo-tema">
+          <button type="button" data-tema-boton="auto" aria-pressed="true">Automático</button>
+          <button type="button" data-tema-boton="claro" aria-pressed="false">Claro</button>
+          <button type="button" data-tema-boton="oscuro" aria-pressed="false">Oscuro</button>
+        </div>
+      </div>
+      <div class="bloque-ajuste">
+        <p class="rotulo" id="rotulo-contraste">Contraste</p>
+        <div class="grupo" role="group" aria-labelledby="rotulo-contraste">
+          <button type="button" id="contraste" aria-pressed="false">Contraste alto</button>
+        </div>
+      </div>
+      <div class="bloque-ajuste">
+        <p class="rotulo" id="rotulo-voz">Lectura en voz alta</p>
+        <div class="grupo" role="group" aria-labelledby="rotulo-voz">
+          <button type="button" id="escuchar" aria-pressed="false">Escuchar esta página</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p id="aviso-ajustes" class="solo-lector" role="status"></p>
+  <div id="controles-lectura" class="barra-lectura" hidden>
+    <div class="contenedor">
+      <button type="button" id="lectura-repetir">Repetir párrafo</button>
+      <button type="button" id="lectura-siguiente">Siguiente párrafo</button>
+      <button type="button" id="lectura-detener">Detener lectura</button>
+    </div>
+  </div>
+
+  <main id="contenido" tabindex="-1">
+    <div class="contenedor">
+      <h1>Descargar las apps de CECAPI</h1>
+      <p>Las apps usan el mismo asistente que esta página y se manejan con la voz. Antes de usarlas te pedirán aceptar las políticas de uso y privacidad.</p>
+
+      <div id="lista-descargas" aria-live="polite">
+        <p id="cargando-descargas">Cargando las versiones disponibles.</p>
+      </div>
+      <noscript>
+        <p class="pendiente">Para ver las descargas activa JavaScript, o búscalas en la sección de versiones (Releases) del repositorio de cada app en GitHub.</p>
+      </noscript>
+
+      <section aria-labelledby="titulo-comprobar">
+        <h2 id="titulo-comprobar">Cómo comprobar que la descarga está completa</h2>
+        <p>Cada archivo tiene una suma de verificación SHA-256. Si la suma de tu archivo es igual a la de esta página, el archivo llegó completo y sin cambios.</p>
+        <p>En Windows, abre PowerShell en la carpeta de descargas y escribe: <code>Get-FileHash nombre-del-archivo -Algorithm SHA256</code></p>
+      </section>
+
+      <section aria-labelledby="titulo-instalar">
+        <h2 id="titulo-instalar">Antes de instalar</h2>
+        <p>Las apps solo se descargan desde aquí o desde GitHub. No están en Google Play ni en la Microsoft Store.</p>
+        <p>En Android, el teléfono te pedirá permiso para instalar apps descargadas desde el navegador. Puedes quitar ese permiso después de instalar.</p>
+        <p>En Windows, la app es un archivo .exe. Windows puede mostrar un aviso de SmartScreen porque la app todavía es nueva. Antes de seguir, comprueba la suma SHA-256 de esta página; si coincide, elige "Más información" y luego "Ejecutar de todos modos".</p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="pie">
+    <div class="contenedor">
+      <ul>
+        <li><a href="./">Volver al asistente</a></li>
+        <li><a href="politicas.html">Políticas de uso y privacidad</a></li>
+      </ul>
+      <p>Centro de Capacitación para Invidentes A. C., Durango.</p>
+    </div>
+  </footer>
+</body>
+</html>
