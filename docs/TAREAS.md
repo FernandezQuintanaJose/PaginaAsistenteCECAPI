@@ -23,9 +23,9 @@ Reglas de trabajo:
 
 | # | Tarea | Dónde | Hecho cuando |
 |---|---|---|---|
-| A1 | **Servidor publicado**: poner `apiBase` en `assets/js/config.v2.js` y, si no es `*.onrender.com`, el `connect-src` de la CSP de `index.html`. | `config.v2.js`, `index.html` | El chat responde contra el servidor real desde la URL de Pages. |
+| A1 | **Servidor publicado**: poner `apiBase` en `assets/js/config.v3.js` y, si no es `*.onrender.com`, el `connect-src` de la CSP de `index.html`. | `config.v3.js`, `index.html` | El chat responde contra el servidor real desde la URL de Pages. |
 | A2 | **CORS y clave**: el servidor debe permitir `https://fernandezquintanajose.github.io` (y el dominio final), y `/preguntar` hoy pide `X-Clave-App`, que una página pública no puede llevar. Acordar con el equipo del servidor una solución (por ejemplo, una ruta pública con límite por IP). **No** poner la clave en el JavaScript: cualquiera la lee. | Servidor + `api.v4.js` | Decisión escrita y probada. Hasta entonces la página dice que aún no puede preguntar. |
-| A3 | **Rutas de cuenta**: llenar `config.rutas` cuando existan y decidir `permitirSinCuenta`. | `config.v2.js` | `npm run cuenta` pasa contra rutas reales o su simulación actualizada. |
+| A3 (hecho 8 nov, falta probar contra el servidor publicado) | **Rutas de cuenta**: `config.rutas` ya apunta a `/cuenta/...`; con eso `permitirSinCuenta` deja de aplicar. | `config.v3.js` | `npm run cuenta` pasa contra rutas reales o su simulación actualizada. |
 | A4 | **Políticas**: datos entre corchetes, correo ARCO confirmado por CECAPI y revisión legal. | `politicas.html` | Sin corchetes. Revisión legal por escrito. |
 | A5 | **Descargas**: cuando existan los Releases de Android y Windows, registrar versión, archivo, url, tamaño y SHA-256. | `datos/descargas.v1.json` | La página muestra los botones; `npm run descargas` pasa. |
 | A6 | **Activar Pages** (rama `main`, carpeta raíz). El código ya está en `main`. | GitHub | Abre en su URL. |
@@ -36,7 +36,7 @@ Reglas de trabajo:
 |---|---|---|
 | B1 | **Lectores de pantalla**: NVDA, Narrator y TalkBack. Recorrer chat, políticas, descargas y mensajes de error. Anotar en `docs/LECTORES.md` (crearlo). Las pruebas automáticas no sustituyen esto. | Lista de hallazgos con navegador y versión; corregidos los que impiden usar el chat. |
 | B2 | **Servidor dormido**: el plan gratuito tarda cerca de un minuto en despertar. Comprobar que el aviso hablado y el indicador de espera funcionan con el servidor real. | Probado con el servidor dormido. |
-| B3 | **Pruebas hostiles nuevas**: pegar texto enorme, HTML, emojis, enviar con el servidor caído, cerrar la pestaña a mitad de respuesta. Añadirlas a `pruebas/hostil.mjs`. | Cada caso nuevo tiene su prueba y pasa. |
+| B3 | ~~**Pruebas hostiles nuevas**~~ **Hecho el 5 nov** en `pruebas/hostil.mjs` (35 casos): texto de 100 000 caracteres pegado (el campo corta en 2000), emojis y secuencias raras, servidor caído y recargar a mitad de respuesta. HTML ya estaba (XSS). Queda cerrar la pestaña con el servidor aún respondiendo, que no se puede distinguir de recargar. | Pasa. |
 | B4 | **Navegadores**: Firefox, Safari de iPhone y Edge. **SIN VERIFICAR** hoy (las pruebas usan Chromium). | Lista de lo que falla. |
 
 ## Conectar con los demás equipos
