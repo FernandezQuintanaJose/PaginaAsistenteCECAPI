@@ -21,7 +21,7 @@ const servidor = await servir(PUERTO);
 const navegador = await chromium.launch();
 const contexto = await navegador.newContext({ bypassCSP: false });
 const config = (await readFile(new URL("../assets/js/config.v3.js", import.meta.url), "utf8"))
-  .replace('apiBase: ""', `apiBase: "${API}"`)
+  .replace(/apiBase: "[^"]*"/, `apiBase: "${API}"`)
   .replace("avisoDespertarMs: 4000", "avisoDespertarMs: 300")
   // Este flujo es el del chat sin cuenta (servidor sin rutas de cuenta); las cuentas van en cuenta.mjs.
   .replace(/(registro|verificar|acceso|recuperar|restablecer|aceptacion|borrarChats|eliminarCuenta): "\/cuenta\/\w+"/g, "$1: null");

@@ -1,9 +1,9 @@
 // Configuración del asistente web. Es pública: aquí NO va ninguna llave ni secreto.
 // Al cambiar apiBase, añadir el mismo origen a connect-src en la CSP de index.html.
 window.CECAPI_CONFIG = {
-  // Dirección del servidor de IA, sin "/" al final. Vacía: el chat avisa que no está configurado.
+  // Dirección del servidor de IA, sin "/" al final. Vacía: el chat avisa que no está configurado. El servidor tiene que permitir el origen de esta página (ORIGENES_WEB).
   // Ejemplo: "https://cecapi-asistente.onrender.com"
-  apiBase: "",
+  apiBase: "https://cecapi-asistente.onrender.com",
 
   // Rutas del servidor. null = el servidor todavía no la tiene; la página lo avisa y no falla.
   // Las de cuenta son las de backend/cuentas.py (decisión 0020 de EstadiasAppMobil).

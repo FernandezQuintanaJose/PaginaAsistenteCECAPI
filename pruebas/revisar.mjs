@@ -20,6 +20,8 @@ let fallas = 0;
 const VISTAS = [["celular", 375, 800], ["tablet", 768, 1024], ["tablet-h", 1024, 768], ["laptop", 1366, 768], ["pantalla", 1920, 1080]];
 for (const esquema of ["light", "dark", "alto", "oscuro-manual", "claro-manual", "texto-grande"]) {
   const contexto = await navegador.newContext({ bypassCSP: true, colorScheme: esquema === "dark" || esquema === "claro-manual" ? "dark" : "light", viewport: { width: 375, height: 800 } });
+  // El servidor real no se toca en las pruebas: la página lo "despierta" al abrir.
+  await contexto.route("https://*.onrender.com/**", (r) => r.fulfill({ headers: { "Access-Control-Allow-Origin": "*" }, json: {} }));
   if (esquema === "texto-grande") await contexto.addInitScript(() => localStorage.setItem("cecapi.escala", "2"));
   if (esquema === "alto") await contexto.addInitScript(() => localStorage.setItem("cecapi.contraste", "alto"));
   if (esquema === "oscuro-manual") await contexto.addInitScript(() => localStorage.setItem("cecapi.tema", "oscuro"));

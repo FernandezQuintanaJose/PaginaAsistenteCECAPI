@@ -18,7 +18,7 @@ const revisar = (ok, d) => { console.log(`${ok ? "bien " : "FALLA"} ${d}`); if (
 
 const configBase = await readFile(new URL("../assets/js/config.v3.js", import.meta.url), "utf8");
 function configurar(texto, { verificacion = true } = {}) {
-  let t = texto.replace('apiBase: ""', `apiBase: "${API}"`).replace("avisoDespertarMs: 4000", "avisoDespertarMs: 30000");
+  let t = texto.replace(/apiBase: "[^"]*"/, `apiBase: "${API}"`).replace("avisoDespertarMs: 4000", "avisoDespertarMs: 30000");
   for (const r of ["registro", "verificar", "acceso", "recuperar", "restablecer", "aceptacion", "borrarChats", "eliminarCuenta"]) {
     t = t.replace(new RegExp(`${r}: null`), `${r}: "/cuenta/${r}"`);
   }
@@ -259,7 +259,7 @@ revisar((await texto(p, "#cuenta-estado")).includes("cuenta se creó") && await 
 
 // ------------------------------------------------------------------ cuentas aún no disponibles
 const ctx2 = await navegador.newContext();
-await ctx2.route("**/assets/js/config.v3.js", (r) => r.fulfill({ contentType: "text/javascript", body: configBase.replace('apiBase: ""', `apiBase: "${API}"`).replace(/(registro|verificar|acceso|recuperar|restablecer|aceptacion|borrarChats|eliminarCuenta): "\/cuenta\/\w+"/g, "$1: null") }));
+await ctx2.route("**/assets/js/config.v3.js", (r) => r.fulfill({ contentType: "text/javascript", body: configBase.replace(/apiBase: "[^"]*"/, `apiBase: "${API}"`).replace(/(registro|verificar|acceso|recuperar|restablecer|aceptacion|borrarChats|eliminarCuenta): "\/cuenta\/\w+"/g, "$1: null") }));
 await ctx2.route(`${API}/**`, (r) => r.fulfill({ headers: CORS, json: {} }));
 const p2 = await ctx2.newPage();
 await p2.goto(SITIO, { waitUntil: "networkidle" });

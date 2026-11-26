@@ -13,7 +13,7 @@ const srv = await servir(PUERTO);
 const nav = await chromium.launch();
 const leerRepo = (ruta) => readFile(new URL("../" + ruta, import.meta.url), "utf8");
 const version = (await leerRepo("politicas.html")).match(/data-version="([^"]+)"/)[1];
-const cfgBase = (await leerRepo("assets/js/config.v3.js")).replace('apiBase: ""', `apiBase: "${API}"`).replace("avisoDespertarMs: 4000", "avisoDespertarMs: 300")
+const cfgBase = (await leerRepo("assets/js/config.v3.js")).replace(/apiBase: "[^"]*"/, `apiBase: "${API}"`).replace("avisoDespertarMs: 4000", "avisoDespertarMs: 300")
   // Sin rutas de cuenta: aquí se ataca el chat; las cuentas tienen su propia prueba (cuenta.mjs).
   .replace(/(registro|verificar|acceso|recuperar|restablecer|aceptacion|borrarChats|eliminarCuenta): "\/cuenta\/\w+"/g, "$1: null");
 let hallazgos = [];
