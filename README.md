@@ -11,7 +11,7 @@ La ficha del proyecto está en `docs/FICHA.md`, las reglas comunes en `docs/FICH
 | `index.html` | Asistente: políticas por partes, cuenta y chat |
 | `politicas.html` | Políticas de uso y privacidad (borrador). Es la única fuente del texto: `index.html` lo lee de aquí |
 | `descargas.html` | Descargas con versión, tamaño y SHA-256, leídas de `datos/descargas.v1.json`. Solo enlaces a GitHub Releases |
-| `404.html` | Usa `<base href="/PaginaAsistenteCECAPI/">`; con dominio propio, cambiar a `/` |
+| `404.html` | Usa `<base href="/">` (dominio propio `alia-invidentes.com`, ver `CNAME`) |
 | `assets/js/config.v3.js` | Servidor, rutas y reglas de cuenta. Público: sin llaves |
 | `assets/js/api.v4.js` | Cliente del servidor con tiempo de espera y errores en español |
 | `assets/js/asistente.v4.js` | Lógica de la página: políticas, cuenta, chat |
@@ -79,7 +79,7 @@ Requiere Node 18 o más reciente.
 ```
 npm install
 npx playwright install chromium   # solo la primera vez
-npm run servir     # http://localhost:8080/PaginaAsistenteCECAPI/
+npm run servir     # http://localhost:8080/
 npm run revisar    # axe (WCAG 2.2 AA), consola y recursos, en 5 tamaños de pantalla y texto al 200 %, en claro, oscuro y contraste alto
 npm run flujo      # políticas, chat y panel de ajustes con un servidor simulado
 npm run cuenta     # registro, acceso, recuperar, borrar chats y eliminar cuenta con un servidor simulado

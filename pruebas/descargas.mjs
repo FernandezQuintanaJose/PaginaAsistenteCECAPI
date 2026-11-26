@@ -5,7 +5,7 @@ import { servir } from "./servidor.mjs";
 const require = createRequire(import.meta.url);
 const { chromium } = require("playwright");
 const PUERTO = 8094;
-const SITIO = `http://localhost:${PUERTO}/PaginaAsistenteCECAPI/descargas.html`;
+const SITIO = `http://localhost:${PUERTO}/descargas.html`;
 
 let fallas = 0;
 const revisar = (ok, d) => { console.log(`${ok ? "bien " : "FALLA"} ${d}`); if (!ok) fallas++; };

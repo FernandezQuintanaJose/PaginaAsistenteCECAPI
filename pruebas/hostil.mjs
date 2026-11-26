@@ -8,7 +8,7 @@ import { servir } from "./servidor.mjs";
 const require = createRequire(import.meta.url);
 const { chromium } = require("playwright");
 const PUERTO = 8111, API = "https://qa-cecapi.onrender.com";
-const URL_SITIO = `http://localhost:${PUERTO}/PaginaAsistenteCECAPI/`;
+const URL_SITIO = `http://localhost:${PUERTO}/`;
 const srv = await servir(PUERTO);
 const nav = await chromium.launch();
 const leerRepo = (ruta) => readFile(new URL("../" + ruta, import.meta.url), "utf8");

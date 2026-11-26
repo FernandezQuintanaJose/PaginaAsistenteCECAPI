@@ -8,7 +8,7 @@ const require = createRequire(import.meta.url);
 const { chromium } = require("playwright");
 const AXE = require.resolve("axe-core/axe.min.js");
 const PUERTO = 8092;
-const URL_SITIO = `http://localhost:${PUERTO}/PaginaAsistenteCECAPI/`;
+const URL_SITIO = `http://localhost:${PUERTO}/`;
 const API = "https://prueba-cecapi.onrender.com";
 
 let fallas = 0;

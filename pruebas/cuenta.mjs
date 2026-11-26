@@ -9,7 +9,7 @@ const require = createRequire(import.meta.url);
 const { chromium } = require("playwright");
 const AXE = require.resolve("axe-core/axe.min.js");
 const PUERTO = 8093;
-const SITIO = `http://localhost:${PUERTO}/PaginaAsistenteCECAPI/`;
+const SITIO = `http://localhost:${PUERTO}/`;
 const API = "https://prueba-cecapi.onrender.com";
 const CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "Content-Type, Authorization, Accept", "Access-Control-Allow-Methods": "GET,POST,DELETE" };
 
